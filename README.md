@@ -78,6 +78,8 @@ cargo tree -e normal --no-default-features
 
 测试使用固定假凭证与 MockTransport；HTTP 适配器测试只访问 127.0.0.1 临时端口，不依赖真实腾讯云凭证。签名预期值通过独立 Python hashlib/hmac 实现核对。
 
+最低 Rust 版本 **1.85.0** 已在 macOS ARM 上通过上述两组测试。离线性能基准使用 release 配置，显式运行，不进入默认测试或 SDK 运行时依赖；环境、结果和复现命令见 [实测报告](docs/validation.md)。
+
 ## 设计文档
 
 - [整体架构](docs/architecture.md)

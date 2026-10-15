@@ -6,6 +6,9 @@
 
 use std::{future::Future, pin::Pin};
 
+#[cfg(test)]
+mod benchmarks;
+
 mod client;
 mod common;
 /// 凭证快照与可替换的凭证来源。
