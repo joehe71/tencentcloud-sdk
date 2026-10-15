@@ -1,0 +1,30 @@
+[package]
+name = "tencentcloud-sdk-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+description = "腾讯云 API 3.0 的客户端、TC3 签名和传输内核"
+
+[features]
+default = []
+transport-reqwest = ["dep:reqwest", "dep:futures-util"]
+
+[dependencies]
+bytes.workspace = true
+futures-core.workspace = true
+futures-util = { workspace = true, optional = true }
+hmac.workspace = true
+http.workspace = true
+reqwest = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+time.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "test-util", "net", "io-util", "sync"] }
+
+[lints]
+workspace = true
