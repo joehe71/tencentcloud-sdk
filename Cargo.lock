@@ -1222,14 +1222,29 @@ dependencies = [
 name = "tencentcloud-sdk"
 version = "0.1.0"
 dependencies = [
- "tencentcloud-sdk-core",
  "tencentcloud-sdk-cos",
+ "tencentcloud-sdk-foundation",
  "tencentcloud-sdk-ses",
  "tencentcloud-sdk-ssm",
 ]
 
 [[package]]
-name = "tencentcloud-sdk-core"
+name = "tencentcloud-sdk-cos"
+version = "0.1.0"
+dependencies = [
+ "base64 0.23.1",
+ "bytes",
+ "futures-util",
+ "http",
+ "md-5",
+ "quick-xml",
+ "serde",
+ "tencentcloud-sdk-foundation",
+ "tokio",
+]
+
+[[package]]
+name = "tencentcloud-sdk-foundation"
 version = "0.1.0"
 dependencies = [
  "bytes",
@@ -1249,28 +1264,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "tencentcloud-sdk-cos"
-version = "0.1.0"
-dependencies = [
- "base64 0.23.1",
- "bytes",
- "futures-util",
- "http",
- "md-5",
- "quick-xml",
- "serde",
- "tencentcloud-sdk-core",
- "tokio",
-]
-
-[[package]]
 name = "tencentcloud-sdk-ses"
 version = "0.1.0"
 dependencies = [
  "http",
  "serde",
  "serde_json",
- "tencentcloud-sdk-core",
+ "tencentcloud-sdk-foundation",
  "tokio",
 ]
 
@@ -1281,7 +1281,7 @@ dependencies = [
  "http",
  "serde",
  "serde_json",
- "tencentcloud-sdk-core",
+ "tencentcloud-sdk-foundation",
  "tokio",
 ]
 

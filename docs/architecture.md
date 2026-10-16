@@ -29,7 +29,7 @@ tencentcloud-sdk/
 │   ├── architecture.md
 │   └── codegen.md                     # 元数据格式和生成约定
 ├── crates/
-│   ├── core/                         # tencentcloud-sdk-core
+│   ├── core/                         # tencentcloud-sdk-foundation
 │   │   ├── Cargo.toml
 │   │   ├── src/
 │   │   │   ├── lib.rs
