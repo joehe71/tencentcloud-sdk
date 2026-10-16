@@ -23,10 +23,18 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - name: Update the release PR or create a GitHub release
-        uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
+      - name: Check out the automation scripts
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          target-branch: main
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+          persist-credentials: false
+      - name: Install the pinned release-please package
+        run: >-
+          npm install --prefix "$RUNNER_TEMP/release-please"
+          --no-package-lock --no-audit --no-fund --ignore-scripts
+          release-please@17.3.0
+      - name: Create or update the release PR only
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          export NODE_PATH="$RUNNER_TEMP/release-please/node_modules"
+          node scripts/release-please-pr.cjs

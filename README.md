@@ -89,7 +89,7 @@ bash scripts/check-coverage.sh
 
 ## Releases
 
-Release Please manages the shared workspace version, [changelog](CHANGELOG.md), GitHub Releases, and `vX.Y.Z` tags. Crates.io publishing remains manual and disabled until its prerequisites are complete. See the [release guide](docs/releases.md) for repository setup and the maintainer workflow.
+Release Please creates or updates PRs for the shared workspace version and [changelog](CHANGELOG.md) on pushes to `main`. It never creates tags or GitHub Releases. Crates.io publishing remains manual and disabled until its prerequisites are complete. See the [release guide](docs/releases.md) for repository setup and the maintainer workflow.
 
 ## 设计文档
 
