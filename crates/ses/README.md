@@ -68,4 +68,12 @@ cargo test -p tencentcloud-sdk-ses
 bash scripts/check-coverage.sh
 ```
 
-The reference contributes annotated field names/types and action identifiers, not Java inheritance, behavior, or comments. The checked-in schema records the precise wire snapshot; model fixtures supplement, rather than replace, independent hand-written tests. Attribution and the upstream Apache-2.0 license are retained in `THIRD_PARTY_NOTICES.md` and `LICENSE`. See [official SES API documentation](https://cloud.tencent.com/document/product/1288/51034).
+The reference contributes annotated field names/types and action identifiers, not Java inheritance, behavior, or comments. The checked-in schema records the precise wire snapshot; model fixtures supplement, rather than replace, independent hand-written tests. See the attribution below and `LICENSE` for the upstream Apache-2.0 terms. See [official SES API documentation](https://cloud.tencent.com/document/product/1288/51034).
+
+## Third-party attribution
+
+The SDK's SES/SSM protocol metadata references [Tencent Cloud Java SDK](https://github.com/TencentCloud/tencentcloud-sdk-java), version 3.2.40. Product-specific API versions are recorded in the product guides and schema snapshots.
+
+Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+
+Upstream material is licensed under Apache-2.0; see `LICENSE`. Annotated protocol field names/types and operation identifiers were transformed into Rust serde models, typed action bindings, schema manifests, and test fixtures. Rust naming, optional-field handling, model layout, and redacted Debug implementations are specific to this repository. Java implementation logic, inheritance, generated accessors, and source comments are not used.

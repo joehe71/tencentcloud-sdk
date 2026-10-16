@@ -32,7 +32,7 @@ The independent [Publish crates workflow](../.github/workflows/publish-crates.ym
 
 Configure a GitHub Actions repository secret named **`CARGO_REGISTRY_TOKEN`** before merging the first generated version PR. Store the credential directly in GitHub's Secrets UI, never in chat, source, or shell arguments. Its crates.io account must have a verified email, be allowed to create the five package names for their first publication, and own the crates or have the necessary team permissions for updates. Use the narrowest available publish scopes for these exact names. A name being unclaimed is not a reservation; authorization and name availability are enforced by crates.io at publication time. The workflow does not provision credentials, modify owners, or change repository settings.
 
-The prepare job has read-only repository/PR permissions. The publish job checks out the exact version PR commit, not the latest `main` code. It installs Rust 1.85.0, validates all five package versions, seven internal dependency requirements, lockfile, changelog, registry restrictions, licenses and notices, then runs all-feature and no-default-feature tests and strict rustdoc. Registry credentials are present only in the final tag/upload step. Missing registry credentials stop the workflow before creating a tag.
+The prepare job has read-only repository/PR permissions. The publish job checks out the exact version PR commit, not the latest `main` code. It installs Rust 1.85.0, validates all five package versions, seven internal dependency requirements, lockfile, changelog, registry restrictions, licenses and README attribution, then runs all-feature and no-default-feature tests and strict rustdoc. Registry credentials are present only in the final tag/upload step. Missing registry credentials stop the workflow before creating a tag.
 
 The final step creates a lightweight `vX.Y.Z` tag at that exact commit using the built-in `GITHUB_TOKEN`. An existing lightweight or annotated tag is accepted only if it resolves to the same commit; no tag is moved or replaced. It then publishes these packages sequentially with `cargo publish --locked --registry crates-io`:
 
@@ -42,7 +42,7 @@ The final step creates a lightweight `vX.Y.Z` tag at that exact commit using the
 4. `tencentcloud-sdk-ssm`
 5. `tencentcloud-sdk`
 
-Each uploaded archive must contain matching source-commit metadata, LICENSE, and third-party notices. The workflow verifies its SHA-256 against the crates.io sparse index and waits up to 30 index checks (10 seconds apart) before moving to a dependent package. Neither workflow creates a GitHub Release. The publishing workflow is serialized and is never cancelled by a newer version push.
+Each uploaded archive must contain matching source-commit metadata, LICENSE, and README with third-party attribution. The workflow verifies its SHA-256 against the crates.io sparse index and waits up to 30 index checks (10 seconds apart) before moving to a dependent package. Neither workflow creates a GitHub Release. The publishing workflow is serialized and is never cancelled by a newer version push.
 
 ### Recovery
 
@@ -67,7 +67,7 @@ Run `actionlint .github/workflows/release-please.yml .github/workflows/publish-c
 ## Boundaries
 
 - This workflow creates or updates version/changelog PRs only. It never creates tags or GitHub Releases. It never merges its own PRs or runs `cargo publish`.
-- All five crates are explicitly restricted to the `crates-io` registry and inherit Apache-2.0 and the repository URL. Each package includes its license, third-party notices, and readme.
+- All five crates are explicitly restricted to the `crates-io` registry and inherit Apache-2.0 and the repository URL. Each package includes its license and readme; third-party attribution is retained in the readme rather than a separate notices file.
 - The workflow checks out the automation scripts, but requires no Rust toolchain, cloud credentials, or access to Tencent Cloud APIs.
 - Concurrent runs are serialized per ref and are not cancelled halfway through release operations.
 

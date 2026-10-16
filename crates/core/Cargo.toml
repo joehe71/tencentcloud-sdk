@@ -7,7 +7,7 @@ publish = ["crates-io"]
 license.workspace = true
 repository.workspace = true
 readme = "README.md"
-include = ["src/**", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md"]
+include = ["src/**", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE"]
 description = "Client, TC3 signing, and transport core for Tencent Cloud API 3.0"
 
 [features]

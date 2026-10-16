@@ -7,7 +7,7 @@ publish = ["crates-io"]
 license.workspace = true
 repository.workspace = true
 readme = "README.md"
-include = ["src/**", "docs/**", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md", "licenses/Apache-2.0.txt"]
+include = ["src/**", "docs/**", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE", "licenses/Apache-2.0.txt"]
 description = "A modular Tencent Cloud SDK for Rust"
 
 [workspace]

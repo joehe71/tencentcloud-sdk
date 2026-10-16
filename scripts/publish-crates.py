@@ -106,6 +106,13 @@ def prepare():
     return {"ready": "true", "version": version, "sha": sha}
 
 
+def validate_attribution(content, name):
+    for marker in ("https://github.com/TencentCloud/tencentcloud-sdk-java", "3.2.40",
+                   "Copyright (c) 2017-2025 Tencent. All Rights Reserved.",
+                   "Apache-2.0", "Annotated protocol field names/types and operation identifiers were transformed"):
+        require(marker in content, f"Missing third-party attribution in README: {name}")
+
+
 def validate(version, sha):
     valid_version(version)
     require(re.fullmatch(r"[0-9a-f]{40}", sha), "Invalid release commit")
@@ -126,10 +133,11 @@ def validate(version, sha):
         require(package.get("publish") == ["crates-io"], f"crates.io publication is not enabled: {name}")
         for field in ("license", "repository"):
             require(package.get(field) == {"workspace": True}, f"Expected shared {field}: {name}")
-        for file in ("LICENSE", "THIRD_PARTY_NOTICES.md"):
-            require((directory / file).read_bytes() == (ROOT / file).read_bytes(), f"Missing or inconsistent {file}: {name}")
+        require((directory / "LICENSE").read_bytes() == (ROOT / "LICENSE").read_bytes(), f"Missing or inconsistent LICENSE: {name}")
+        for file in ("LICENSE", "README.md"):
             require(file in package.get("include", []), f"Package excludes {file}: {name}")
-        require((directory / package["readme"]).is_file(), f"Missing readme: {name}")
+        require(package.get("readme") == "README.md", f"Unexpected readme: {name}")
+        validate_attribution((directory / "README.md").read_text(), name)
         for section in ("dependencies", "dev-dependencies", "build-dependencies"):
             for dependency, spec in cargo.get(section, {}).items():
                 if dependency in names:
@@ -182,9 +190,10 @@ def archive_checksum(name, version, sha):
         info = package.extractfile(f"{name}-{version}/.cargo_vcs_info.json")
         require(info is not None, "Archive has no source commit metadata")
         require(json.load(info)["git"]["sha1"] == sha, "Archive source commit mismatch")
-        for file in ("LICENSE", "THIRD_PARTY_NOTICES.md"):
+        directory = ROOT / dict(PACKAGES)[name]
+        for file in ("LICENSE", "README.md"):
             included = package.extractfile(f"{name}-{version}/{file}")
-            require(included is not None and included.read() == (ROOT / file).read_bytes(), f"Archive is missing {file}")
+            require(included is not None and included.read() == (directory / file).read_bytes(), f"Archive has missing or inconsistent {file}")
     return hashlib.sha256(archive.read_bytes()).hexdigest()
 
 

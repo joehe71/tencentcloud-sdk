@@ -97,3 +97,11 @@ Release Please creates or updates PRs for the shared workspace version and [chan
 - [Architecture](docs/architecture.md)
 - [Modularity and opt-in dependencies](docs/modularity.md)
 - [Performance and offline benchmarks](docs/performance.md)
+
+## Third-party attribution
+
+The SDK's SES/SSM protocol metadata references [Tencent Cloud Java SDK](https://github.com/TencentCloud/tencentcloud-sdk-java), version 3.2.40. Product-specific API versions are recorded in the product guides and schema snapshots.
+
+Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+
+Upstream material is licensed under Apache-2.0; see `LICENSE`. Annotated protocol field names/types and operation identifiers were transformed into Rust serde models, typed action bindings, schema manifests, and test fixtures. Rust naming, optional-field handling, model layout, and redacted Debug implementations are specific to this repository. Java implementation logic, inheritance, generated accessors, and source comments are not used.

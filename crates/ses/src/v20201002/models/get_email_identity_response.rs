@@ -1,7 +1,7 @@
 // Protocol metadata reference: Tencent Cloud Java SDK (Apache-2.0).
 // Copyright (c) 2017-2025 Tencent. All Rights Reserved.
 // Modified: generated Rust models, explicit wire renames, optional fields and redacted Debug.
-// See THIRD_PARTY_NOTICES.md and LICENSE.
+// See README.md and LICENSE.
 use super::{DnsAttributes, TagList};
 use serde::{Deserialize, Serialize};
 use std::fmt;

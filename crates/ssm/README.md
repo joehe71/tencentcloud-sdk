@@ -64,4 +64,12 @@ cargo test -p tencentcloud-sdk-ssm
 bash scripts/check-coverage.sh
 ```
 
-The reference contributes annotated wire metadata, not Java behavior or comments. Model fixtures supplement independent hand-written fixtures. Upstream attribution and Apache-2.0 terms are in `THIRD_PARTY_NOTICES.md` and `LICENSE`. See [official SSM documentation](https://cloud.tencent.com/document/product/1140).
+The reference contributes annotated wire metadata, not Java behavior or comments. Model fixtures supplement independent hand-written fixtures. See the attribution below and `LICENSE` for the upstream Apache-2.0 terms. See [official SSM documentation](https://cloud.tencent.com/document/product/1140).
+
+## Third-party attribution
+
+The SDK's SES/SSM protocol metadata references [Tencent Cloud Java SDK](https://github.com/TencentCloud/tencentcloud-sdk-java), version 3.2.40. Product-specific API versions are recorded in the product guides and schema snapshots.
+
+Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+
+Upstream material is licensed under Apache-2.0; see `LICENSE`. Annotated protocol field names/types and operation identifiers were transformed into Rust serde models, typed action bindings, schema manifests, and test fixtures. Rust naming, optional-field handling, model layout, and redacted Debug implementations are specific to this repository. Java implementation logic, inheritance, generated accessors, and source comments are not used.
