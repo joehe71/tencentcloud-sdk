@@ -1233,6 +1233,7 @@ version = "0.1.0"
 dependencies = [
  "tencentcloud-sdk-core",
  "tencentcloud-sdk-cos",
+ "tencentcloud-sdk-ses",
 ]
 
 [[package]]
@@ -1266,6 +1267,17 @@ dependencies = [
  "md-5",
  "quick-xml",
  "serde",
+ "tencentcloud-sdk-core",
+ "tokio",
+]
+
+[[package]]
+name = "tencentcloud-sdk-ses"
+version = "0.1.0"
+dependencies = [
+ "http",
+ "serde",
+ "serde_json",
  "tencentcloud-sdk-core",
  "tokio",
 ]

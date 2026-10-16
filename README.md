@@ -2,7 +2,7 @@
 
 按 Rust 惯用法设计的腾讯云 API 3.0 SDK：对外一个入口 crate，对内将共享内核与产品封装分离。Java SDK 只用于协议和模型参考，不移植其类层次或反射调用。
 
-当前包含共享内核 `tencentcloud-sdk-core` 与按需启用的 COS 产品 crate；各包均暂不发布。架构文档描述的其他产品、自动分页、SSE 等能力不代表已经实现。
+当前包含共享内核 `tencentcloud-sdk-core` 与按需启用的 COS、SES 产品 crate；各包均暂不发布。架构文档描述的其他产品、自动分页、SSE 等能力不代表已经实现。
 
 ## 已实现
 
@@ -12,6 +12,7 @@
 - 可选凭证文件、CVM 实例角色、STS AssumeRole、TKE/OIDC、显式默认凭证链，以及共享缓存和按需自动刷新。
 - TC3-HMAC-SHA256、POST JSON、固定操作描述和动态通用调用。
 - `cos` feature：独立 COS XML REST 客户端，支持常用对象/桶操作、分块上传和预签名 URL，见 [COS guide](crates/cos/README.md)。
+- `ses` feature：SES 2020-10-02 的 36 个强类型 API，复用 core，见 [SES guide](crates/ses/README.md)。
 - 可替换 Transport；可选 reqwest/Rustls 连接池实现。
 - 按产品的 HTTPS 根端点覆盖、单次 Region/语言/Header/超时选项。
 - JSON 统一响应外层、强类型解析、保留官方错误码与 RequestId。
@@ -79,7 +80,7 @@ cargo tree -e normal --no-default-features
 bash scripts/check-coverage.sh
 ```
 
-全 feature 生产代码行覆盖率要求 **≥90%**，当前实测 **94.25%**；口径、工具配置和报告命令见 [Test coverage](docs/coverage.md)。
+全 feature 生产代码行覆盖率要求 **≥90%**，当前实测 **95.33%**；口径、工具配置和报告命令见 [Test coverage](docs/coverage.md)。
 
 测试使用固定假凭证与 MockTransport；HTTP 适配器测试只访问 127.0.0.1 临时端口，不依赖真实腾讯云凭证。签名预期值通过独立 Python hashlib/hmac 实现核对。
 

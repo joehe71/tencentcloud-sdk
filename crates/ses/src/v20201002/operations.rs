@@ -1,0 +1,39 @@
+// Generated official action-to-request/response bindings.
+operations! {
+    batch_send_email: BatchSendEmailRequest => BatchSendEmailResponse = "BatchSendEmail";
+    create_address_unsubscribe_config: CreateAddressUnsubscribeConfigRequest => CreateAddressUnsubscribeConfigResponse = "CreateAddressUnsubscribeConfig";
+    create_custom_blacklist: CreateCustomBlacklistRequest => CreateCustomBlacklistResponse = "CreateCustomBlacklist";
+    create_email_address: CreateEmailAddressRequest => CreateEmailAddressResponse = "CreateEmailAddress";
+    create_email_identity: CreateEmailIdentityRequest => CreateEmailIdentityResponse = "CreateEmailIdentity";
+    create_email_template: CreateEmailTemplateRequest => CreateEmailTemplateResponse = "CreateEmailTemplate";
+    create_receiver: CreateReceiverRequest => CreateReceiverResponse = "CreateReceiver";
+    create_receiver_detail: CreateReceiverDetailRequest => CreateReceiverDetailResponse = "CreateReceiverDetail";
+    create_receiver_detail_with_data: CreateReceiverDetailWithDataRequest => CreateReceiverDetailWithDataResponse = "CreateReceiverDetailWithData";
+    delete_address_unsubscribe_config: DeleteAddressUnsubscribeConfigRequest => DeleteAddressUnsubscribeConfigResponse = "DeleteAddressUnsubscribeConfig";
+    delete_blacklist: DeleteBlacklistRequest => DeleteBlacklistResponse = "DeleteBlackList";
+    delete_custom_blacklist: DeleteCustomBlacklistRequest => DeleteCustomBlacklistResponse = "DeleteCustomBlackList";
+    delete_email_address: DeleteEmailAddressRequest => DeleteEmailAddressResponse = "DeleteEmailAddress";
+    delete_email_identity: DeleteEmailIdentityRequest => DeleteEmailIdentityResponse = "DeleteEmailIdentity";
+    delete_email_template: DeleteEmailTemplateRequest => DeleteEmailTemplateResponse = "DeleteEmailTemplate";
+    delete_receiver: DeleteReceiverRequest => DeleteReceiverResponse = "DeleteReceiver";
+    get_abuse_report: GetAbuseReportRequest => GetAbuseReportResponse = "GetAbuseReport";
+    get_email_identity: GetEmailIdentityRequest => GetEmailIdentityResponse = "GetEmailIdentity";
+    get_email_template: GetEmailTemplateRequest => GetEmailTemplateResponse = "GetEmailTemplate";
+    get_send_email_status: GetSendEmailStatusRequest => GetSendEmailStatusResponse = "GetSendEmailStatus";
+    get_statistics_report: GetStatisticsReportRequest => GetStatisticsReportResponse = "GetStatisticsReport";
+    list_address_unsubscribe_config: ListAddressUnsubscribeConfigRequest => ListAddressUnsubscribeConfigResponse = "ListAddressUnsubscribeConfig";
+    list_black_email_address: ListBlackEmailAddressRequest => ListBlackEmailAddressResponse = "ListBlackEmailAddress";
+    list_custom_blacklist: ListCustomBlacklistRequest => ListCustomBlacklistResponse = "ListCustomBlacklist";
+    list_email_address: ListEmailAddressRequest => ListEmailAddressResponse = "ListEmailAddress";
+    list_email_identities: ListEmailIdentitiesRequest => ListEmailIdentitiesResponse = "ListEmailIdentities";
+    list_email_templates: ListEmailTemplatesRequest => ListEmailTemplatesResponse = "ListEmailTemplates";
+    list_receiver_details: ListReceiverDetailsRequest => ListReceiverDetailsResponse = "ListReceiverDetails";
+    list_receivers: ListReceiversRequest => ListReceiversResponse = "ListReceivers";
+    list_send_tasks: ListSendTasksRequest => ListSendTasksResponse = "ListSendTasks";
+    send_email: SendEmailRequest => SendEmailResponse = "SendEmail";
+    update_address_unsubscribe_config: UpdateAddressUnsubscribeConfigRequest => UpdateAddressUnsubscribeConfigResponse = "UpdateAddressUnsubscribeConfig";
+    update_custom_blacklist: UpdateCustomBlacklistRequest => UpdateCustomBlacklistResponse = "UpdateCustomBlackList";
+    update_email_identity: UpdateEmailIdentityRequest => UpdateEmailIdentityResponse = "UpdateEmailIdentity";
+    update_email_smtp_password: UpdateEmailSmtpPasswordRequest => UpdateEmailSmtpPasswordResponse = "UpdateEmailSmtpPassWord";
+    update_email_template: UpdateEmailTemplateRequest => UpdateEmailTemplateResponse = "UpdateEmailTemplate";
+}

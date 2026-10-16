@@ -14,6 +14,10 @@ The script runs `cargo llvm-cov --workspace --all-features --locked --fail-under
 
 The only source exclusions are files below `tests/` and the offline `benchmarks.rs` harness. Internal unit tests live under `crates/core/src/tests/`; they retain access to private implementation details but their code is excluded from the coverage denominator. No production module is excluded or marked as coverage-ignored. The facade has no executable statements to count.
 
+## SES addition (2026-10-16)
+
+With the SES product enabled, the workspace reports **95.33% production-line coverage** (2,553 / 2,678), **91.08% function coverage** (398 / 437), and **85.68% region coverage** (1,472 / 1,718), using the same Rust 1.85.0/LLVM toolchain. The SES implementation's measured lines are all covered. The 191 passing offline tests include 93 separate SES model tests, 36 separate action-routing tests and four independent SES scenario tests; four documentation examples compile separately. No production exclusions were added. Derived serialization and macro-generated code are subject to LLVM's normal source mapping; exact routing and populated-field fixtures are verified independently of whether those expansions appear as separate coverage rows.
+
 ## COS addition (2026-10-16)
 
 After adding the optional COS product and core COS signer, the same Rust 1.85.0/LLVM measurement reports **94.25% production-line coverage** (2,164 / 2,296), **88.06% function coverage** (295 / 335), and **84.71% region coverage** (1,363 / 1,609). COS's own implementation covers 641 / 651 lines (98.46%); the optional core signer covers 166 / 174 (95.40%). No production exclusions were added. Verification includes 58 passing offline tests plus three compile-only documentation examples. Coverage statistics do not include documentation examples.
