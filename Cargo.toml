@@ -33,7 +33,7 @@ sha2 = "0.10"
 sha1 = "0.10"
 percent-encoding = "2"
 quick-xml = { version = "0.38", features = ["serialize"] }
-md-5 = "0.10"
+md-5 = "0.11"
 base64 = "0.23"
 time = { version = "0.3", default-features = false, features = ["std"] }
 tokio = { version = "1", default-features = false, features = ["time"] }
