@@ -8,7 +8,7 @@ description = "A modular Tencent Cloud SDK for Rust"
 
 [workspace]
 resolver = "3"
-members = ["crates/core", "crates/cos", "crates/ses"]
+members = ["crates/core", "crates/cos", "crates/ses", "crates/ssm"]
 
 [workspace.package]
 version = "0.1.0"
@@ -48,6 +48,7 @@ credentials-roles = ["tencentcloud-sdk-core/credentials-roles"]
 transport-reqwest = ["tencentcloud-sdk-core/transport-reqwest", "tencentcloud-sdk-cos?/transport-reqwest"]
 cos = ["dep:tencentcloud-sdk-cos"]
 ses = ["dep:tencentcloud-sdk-ses"]
+ssm = ["dep:tencentcloud-sdk-ssm"]
 
 [dependencies]
 tencentcloud-sdk-core = { version = "0.1.0", path = "crates/core", default-features = false }
@@ -61,6 +62,12 @@ default-features = false
 [dependencies.tencentcloud-sdk-ses]
 version = "0.1.0"
 path = "crates/ses"
+optional = true
+default-features = false
+
+[dependencies.tencentcloud-sdk-ssm]
+version = "0.1.0"
+path = "crates/ssm"
 optional = true
 default-features = false
 

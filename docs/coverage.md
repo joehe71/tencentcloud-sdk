@@ -14,6 +14,10 @@ The script runs `cargo llvm-cov --workspace --all-features --locked --fail-under
 
 The only source exclusions are files below `tests/` and the offline `benchmarks.rs` harness. Internal unit tests live under `crates/core/src/tests/`; they retain access to private implementation details but their code is excluded from the coverage denominator. No production module is excluded or marked as coverage-ignored. The facade has no executable statements to count.
 
+## SSM addition (2026-10-16)
+
+With COS, SES and SSM enabled, workspace production-line coverage is **95.72%** (2,793 / 2,918), function coverage **92.20%** (461 / 500), and region coverage **86.19%** (1,541 / 1,788), under the same Rust 1.85.0/LLVM setup. All measured SSM implementation lines are covered; no production exclusions were added. There are 276 passing offline tests plus five compile-only documentation examples. SSM adds 54 separate model tests, 24 action-routing tests and seven hand-written scenario tests covering secret/SSH redaction, binary pass-through, explicit encryption parameters, no hidden read cache, deletion/error non-replay, page options, bounded bodies and malformed responses. Line coverage is not branch coverage; macro/derive source-mapping caveats remain unchanged.
+
 ## SES addition (2026-10-16)
 
 With the SES product enabled, the workspace reports **95.33% production-line coverage** (2,553 / 2,678), **91.08% function coverage** (398 / 437), and **85.68% region coverage** (1,472 / 1,718), using the same Rust 1.85.0/LLVM toolchain. The SES implementation's measured lines are all covered. The 191 passing offline tests include 93 separate SES model tests, 36 separate action-routing tests and four independent SES scenario tests; four documentation examples compile separately. No production exclusions were added. Derived serialization and macro-generated code are subject to LLVM's normal source mapping; exact routing and populated-field fixtures are verified independently of whether those expansions appear as separate coverage rows.

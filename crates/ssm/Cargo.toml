@@ -1,0 +1,19 @@
+[package]
+name = "tencentcloud-sdk-ssm"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+description = "Typed asynchronous Tencent Cloud Secrets Manager API client"
+
+[dependencies]
+tencentcloud-sdk-core = { version = "0.1.0", path = "../core", default-features = false }
+serde.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+http.workspace = true
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "test-util"] }
+
+[lints]
+workspace = true
