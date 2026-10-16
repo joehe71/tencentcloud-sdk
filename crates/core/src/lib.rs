@@ -11,6 +11,9 @@ mod benchmarks;
 
 mod client;
 mod common;
+/// COS XML API authentication without exposing credential secret material.
+#[cfg(feature = "cos-signing")]
+pub mod cos_signing;
 /// Credentials snapshots and replaceable credentials providers.
 pub mod credentials;
 mod endpoint;

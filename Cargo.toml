@@ -8,7 +8,7 @@ description = "A modular Tencent Cloud SDK for Rust"
 
 [workspace]
 resolver = "3"
-members = ["crates/core"]
+members = ["crates/core", "crates/cos"]
 
 [workspace.package]
 version = "0.1.0"
@@ -25,6 +25,11 @@ reqwest = { version = "0.12.28", default-features = false, features = ["rustls-t
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }
 sha2 = "0.10"
+sha1 = "0.10"
+percent-encoding = "2"
+quick-xml = { version = "0.38", features = ["serialize"] }
+md-5 = "0.10"
+base64 = "0.22"
 time = { version = "0.3", default-features = false, features = ["std"] }
 tokio = { version = "1", default-features = false, features = ["time"] }
 
@@ -40,10 +45,17 @@ pedantic = "warn"
 default = []
 credentials-file = ["tencentcloud-sdk-core/credentials-file"]
 credentials-roles = ["tencentcloud-sdk-core/credentials-roles"]
-transport-reqwest = ["tencentcloud-sdk-core/transport-reqwest"]
+transport-reqwest = ["tencentcloud-sdk-core/transport-reqwest", "tencentcloud-sdk-cos?/transport-reqwest"]
+cos = ["dep:tencentcloud-sdk-cos"]
 
 [dependencies]
 tencentcloud-sdk-core = { version = "0.1.0", path = "crates/core", default-features = false }
+
+[dependencies.tencentcloud-sdk-cos]
+version = "0.1.0"
+path = "crates/cos"
+optional = true
+default-features = false
 
 [lints]
 workspace = true

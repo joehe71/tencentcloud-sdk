@@ -8,6 +8,7 @@ description = "Client, TC3 signing, and transport core for Tencent Cloud API 3.0
 
 [features]
 default = []
+cos-signing = ["dep:sha1", "dep:percent-encoding"]
 credentials-file = ["tokio/fs", "tokio/io-util"]
 credentials-roles = ["credentials-file", "tokio/sync"]
 transport-reqwest = ["dep:reqwest", "dep:futures-util"]
@@ -22,6 +23,8 @@ reqwest = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
 sha2.workspace = true
+sha1 = { workspace = true, optional = true }
+percent-encoding = { workspace = true, optional = true }
 time.workspace = true
 tokio.workspace = true
 

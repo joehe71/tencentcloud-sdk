@@ -14,7 +14,11 @@ The script runs `cargo llvm-cov --workspace --all-features --locked --fail-under
 
 The only source exclusions are files below `tests/` and the offline `benchmarks.rs` harness. Internal unit tests live under `crates/core/src/tests/`; they retain access to private implementation details but their code is excluded from the coverage denominator. No production module is excluded or marked as coverage-ignored. The facade has no executable statements to count.
 
-## Measured result
+## COS addition (2026-10-16)
+
+After adding the optional COS product and core COS signer, the same Rust 1.85.0/LLVM measurement reports **94.25% production-line coverage** (2,164 / 2,296), **88.06% function coverage** (295 / 335), and **84.71% region coverage** (1,363 / 1,609). COS's own implementation covers 641 / 651 lines (98.46%); the optional core signer covers 166 / 174 (95.40%). No production exclusions were added. Verification includes 58 passing offline tests plus three compile-only documentation examples. Coverage statistics do not include documentation examples.
+
+## Core baseline before COS
 
 Measured on 2026-10-16, macOS ARM, Rust 1.85.0 with matching LLVM 19.1.7 tools and cargo-llvm-cov 0.8.7, using the current locked dependencies:
 
