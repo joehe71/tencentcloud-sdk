@@ -46,7 +46,7 @@ const job = workflow.jobs['release-please'];
 assert.equal(job.if, "github.ref == 'refs/heads/main'");
 assert.deepEqual(job.permissions, {contents: 'write', issues: 'write', 'pull-requests': 'write'});
 assert.equal(job.steps.length, 3);
-assert.equal(job.steps[0].uses, 'actions/checkout@v4');
+assert.match(job.steps[0].uses, /^actions\/checkout@v[1-9][0-9]*$/);
 assert.deepEqual(job.steps[0].with, {'persist-credentials': false});
 assert(job.steps[1].run.includes('release-please@17.3.0'));
 assert(job.steps[1].run.includes('--ignore-scripts'));
@@ -71,7 +71,7 @@ assert.equal(publication.if, "needs.prepare.outputs.ready == 'true'");
 assert.deepEqual(publication.permissions, {contents: 'write'});
 assert.equal(publication.steps[0].with.ref, '${{ needs.prepare.outputs.sha }}');
 for (const step of [...preparation.steps, ...publication.steps]) {
-  if (step.uses) assert.equal(step.uses, 'actions/checkout@v4');
+  if (step.uses) assert.match(step.uses, /^actions\/checkout@v[1-9][0-9]*$/);
 }
 const upload = publication.steps.at(-1);
 assert.equal(upload.env.CARGO_REGISTRY_TOKEN, '${{ secrets.CARGO_REGISTRY_TOKEN }}');
