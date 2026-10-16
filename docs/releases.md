@@ -62,8 +62,6 @@ npm install --prefix target/release-please-check --no-audit --no-fund --ignore-s
 NODE_PATH="$PWD/target/release-please-check/node_modules" node scripts/check-release-please.cjs
 ```
 
-Run `python3 scripts/test-publish-crates.py` for the standard-library-only publishing regressions (no network, tags, or uploads). These cover version PR provenance, snapshot/version validation, tag conflicts, dependency order, index delays/timeouts, credential guards, partial-publication recovery checksums, and archive notices/source commit.
-
 Run `actionlint .github/workflows/release-please.yml .github/workflows/publish-crates.yml` separately to validate GitHub Actions syntax and expressions. These checks do not create PRs, GitHub Releases, tags, or registry uploads. The first real workflow run on `main` remains the end-to-end verification of repository permissions and GitHub integration.
 
 ## Boundaries
