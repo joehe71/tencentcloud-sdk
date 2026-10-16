@@ -1,9 +1,13 @@
 [package]
 name = "tencentcloud-sdk"
-version.workspace = true
+version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-publish = false
+publish = ["crates-io"]
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+include = ["src/**", "docs/**", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE", "licenses/Apache-2.0.txt"]
 description = "A modular Tencent Cloud SDK for Rust"
 
 [workspace]
@@ -11,9 +15,10 @@ resolver = "3"
 members = ["crates/core", "crates/cos", "crates/ses", "crates/ssm"]
 
 [workspace.package]
-version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
+license = "Apache-2.0"
+repository = "https://github.com/joehe71/tencentcloud-sdk"
 
 [workspace.dependencies]
 bytes = "1"

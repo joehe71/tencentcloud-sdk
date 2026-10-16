@@ -1,0 +1,17 @@
+# tencentcloud-sdk-core
+
+Shared asynchronous client, TC3-HMAC-SHA256 signing, credentials, transport abstraction, and Tencent Cloud API 3.0 error handling for the modular Tencent Cloud Rust SDK.
+
+Optional features: `credentials-file`, `credentials-roles`, `transport-reqwest`, and `cos-signing`. Default features are empty. Product clients are distributed separately; the core does not depend on them.
+
+See the [repository](https://github.com/joehe71/tencentcloud-sdk) for API guides and examples.
+
+Licensed under Apache-2.0. See `LICENSE`.
+
+## Third-party attribution
+
+The SDK's SES/SSM protocol metadata references [Tencent Cloud Java SDK](https://github.com/TencentCloud/tencentcloud-sdk-java), version 3.2.40. Product-specific API versions are recorded in the product guides and schema snapshots.
+
+Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+
+Upstream material is licensed under Apache-2.0; see `LICENSE`. Annotated protocol field names/types and operation identifiers were transformed into Rust serde models, typed action bindings, schema manifests, and test fixtures. Rust naming, optional-field handling, model layout, and redacted Debug implementations are specific to this repository. Java implementation logic, inheritance, generated accessors, and source comments are not used.

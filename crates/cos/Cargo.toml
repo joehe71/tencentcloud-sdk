@@ -1,9 +1,13 @@
 [package]
 name = "tencentcloud-sdk-cos"
-version.workspace = true
+version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-publish = false
+publish = ["crates-io"]
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+include = ["src/**", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE"]
 description = "Bounded asynchronous Tencent Cloud COS XML API client"
 
 [features]
