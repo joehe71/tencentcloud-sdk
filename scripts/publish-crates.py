@@ -113,6 +113,16 @@ def validate_attribution(content, name):
         require(marker in content, f"Missing third-party attribution in README: {name}")
 
 
+def release_notes(version):
+    valid_version(version)
+    changelog = (ROOT / "CHANGELOG.md").read_text()
+    heading = re.search(r"^## \[?" + re.escape(version) + r"(?:\]|[ \t]|$)[^\n]*", changelog, re.MULTILINE)
+    require(heading is not None, "Missing version changelog entry")
+    notes = re.split(r"^## ", changelog[heading.end():], maxsplit=1, flags=re.MULTILINE)[0].strip()
+    require(notes, "Release changelog entry must not be empty")
+    return notes
+
+
 def validate(version, sha):
     valid_version(version)
     require(re.fullmatch(r"[0-9a-f]{40}", sha), "Invalid release commit")
@@ -147,7 +157,7 @@ def validate(version, sha):
     lock = tomllib.loads((ROOT / "Cargo.lock").read_text())
     entries = [package for package in lock["package"] if package["name"] in names]
     require(len(entries) == 5 and all(package["version"] == version for package in entries), "Lockfile version mismatch")
-    require(re.search(r"^## \[?" + re.escape(version) + r"(?:\]|\s|$)", (ROOT / "CHANGELOG.md").read_text(), re.MULTILINE), "Missing version changelog entry")
+    release_notes(version)
     print(f"Validated five packages and seven dependencies at {version} ({sha})")
 
 
@@ -167,6 +177,28 @@ def ensure_tag(version, sha):
         require(target["type"] == "tag", "Unexpected Git tag object")
         target = github(f"git/tags/{target['sha']}")["object"]
     raise ValueError("Too many nested annotated tags")
+
+
+def ensure_release(version, sha):
+    notes = release_notes(version)
+    tag = f"v{version}"
+    prerelease = "-" in version.split("+", 1)[0]
+    ensure_tag(version, sha)
+    release = github(f"releases/tags/{tag}", missing=True)
+    created = release is None
+    if created:
+        release = github("releases", {
+            "tag_name": tag,
+            "target_commitish": sha,
+            "name": tag,
+            "body": notes,
+            "draft": False,
+            "prerelease": prerelease,
+        })
+    require(isinstance(release, dict) and release.get("tag_name") == tag, "Unexpected GitHub Release tag")
+    require(release.get("draft") is False, "GitHub Release is a draft; inspect it before rerunning")
+    require(release.get("prerelease") is prerelease, "GitHub Release prerelease status mismatch")
+    print(f"{'Created' if created else 'Reusing'} GitHub Release {tag}")
 
 
 def registry_entry(name, version):
@@ -201,7 +233,7 @@ def publish(version, sha):
     validate(version, sha)
     require(os.environ.get("CARGO_REGISTRY_TOKEN"), "Configure the CARGO_REGISTRY_TOKEN GitHub Actions secret before publishing")
     require(os.environ.get("GH_TOKEN"), "Missing GitHub workflow token")
-    ensure_tag(version, sha)
+    ensure_release(version, sha)
     for name, _ in PACKAGES:
         existing = registry_entry(name, version)
         if existing is not None:
