@@ -29,7 +29,7 @@ jobs:
       sha: ${{ steps.release.outputs.sha }}
     steps:
       - name: Check out main and version history
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -48,7 +48,7 @@ jobs:
       contents: write
     steps:
       - name: Check out the exact version PR commit
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4
         with:
           ref: ${{ needs.prepare.outputs.sha }}
           persist-credentials: false

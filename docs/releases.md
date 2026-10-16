@@ -12,7 +12,7 @@ The initial release manifest is empty: there is no previous version PR. The Rust
 
 GitHub Actions must be enabled. In **Settings → Actions → General → Workflow permissions**, enable **Allow GitHub Actions to create and approve pull requests**. Organization policies may require an administrator. The workflow declares its own write permissions for contents, issues/labels, and pull requests; the repository-wide default can remain read-only.
 
-The workflow uses the repository's built-in `GITHUB_TOKEN`. No personal access token or crates.io credential is needed. Checkout is pinned to a full commit SHA with Git credential persistence disabled. The workflow installs `release-please@17.3.0` into the runner's temporary directory with lifecycle scripts disabled. No Rust build or application dependencies are installed. `skip-github-release` is also enabled in the configuration as defense in depth.
+The workflow uses the repository's built-in `GITHUB_TOKEN`. No personal access token or crates.io credential is needed. Checkout uses the `actions/checkout@v4` major-version tag with Git credential persistence disabled. The workflow installs `release-please@17.3.0` into the runner's temporary directory with lifecycle scripts disabled. No Rust build or application dependencies are installed. `skip-github-release` is also enabled in the configuration as defense in depth.
 
 ## Maintainer flow
 
