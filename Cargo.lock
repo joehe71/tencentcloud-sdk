@@ -1220,7 +1220,7 @@ dependencies = [
 
 [[package]]
 name = "tencentcloud-sdk"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "tencentcloud-sdk-cos",
  "tencentcloud-sdk-foundation",
@@ -1230,7 +1230,7 @@ dependencies = [
 
 [[package]]
 name = "tencentcloud-sdk-cos"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "base64 0.23.1",
  "bytes",
@@ -1245,7 +1245,7 @@ dependencies = [
 
 [[package]]
 name = "tencentcloud-sdk-foundation"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "bytes",
  "criterion",
@@ -1265,7 +1265,7 @@ dependencies = [
 
 [[package]]
 name = "tencentcloud-sdk-ses"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "http",
  "serde",
@@ -1276,7 +1276,7 @@ dependencies = [
 
 [[package]]
 name = "tencentcloud-sdk-ssm"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "http",
  "serde",

@@ -1,6 +1,6 @@
 [package]
 name = "tencentcloud-sdk-ses"
-version = "0.1.0"
+version = "0.1.1"
 edition.workspace = true
 rust-version.workspace = true
 publish = ["crates-io"]
@@ -11,7 +11,7 @@ include = ["src/**", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE"]
 description = "Typed asynchronous Tencent Cloud SES API client"
 
 [dependencies]
-tencentcloud-sdk-foundation = { version = "0.1.0", path = "../core", default-features = false }
+tencentcloud-sdk-foundation = { version = "0.1.1", path = "../core", default-features = false }
 serde.workspace = true
 
 [dev-dependencies]
