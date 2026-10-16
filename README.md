@@ -89,7 +89,7 @@ bash scripts/check-coverage.sh
 
 ## Releases
 
-Release Please creates or updates PRs for the shared workspace version and [changelog](CHANGELOG.md) on pushes to `main`. It never creates tags or GitHub Releases. Crates.io publishing remains manual and disabled until its prerequisites are complete. See the [release guide](docs/releases.md) for repository setup and the maintainer workflow.
+Release Please creates or updates PRs for the shared workspace version and [changelog](CHANGELOG.md) on pushes to `main`. A separate publishing workflow tags the merged version PR commit as `vX.Y.Z` and publishes all five crates to crates.io in dependency order. Neither workflow creates GitHub Releases. The SDK is licensed under [Apache-2.0](LICENSE). See the [release guide](docs/releases.md) for credentials, safety checks, and recovery.
 
 ## 设计文档
 

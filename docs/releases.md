@@ -19,12 +19,36 @@ The workflow uses the repository's built-in `GITHUB_TOKEN`. No personal access t
 1. Squash-merge normal PRs into `main` with Conventional Commit titles. Use `feat:`, `fix:`, and `feat!:` / `fix!:` or a `BREAKING CHANGE:` footer as appropriate. The squash commit message, not just the individual branch commits, drives release notes and version selection.
 2. A push to `main` creates or updates the release PR when there are releasable changes. Documentation, CI, or maintenance-only commits do not necessarily create a release. The workflow can also be dispatched manually against `main`; dispatches against other branches are skipped.
 3. Review the generated changelog, all five package versions, internal dependency versions, and `Cargo.lock`. Run the repository's local checks before merging the release PR; this workflow does not replace testing or coverage checks.
-4. Merge the version/changelog PR into `main`. Its versions and changelog become the baseline for the next run. No tag, GitHub Release, or registry upload is created, including on the push caused by this merge.
-5. Publish to crates.io manually only after the separate publishing prerequisites have been completed. Tagging or creating GitHub Releases, if ever wanted, is a separate maintainer action.
+4. Merge the version/changelog PR into `main`. Its versions and changelog become the baseline for the next run. A separate publishing workflow validates the merged version PR, tests its exact commit, creates `vX.Y.Z`, and publishes the five crates to crates.io.
+5. Monitor the **Publish crates** workflow. It publishes core, COS, SES, SSM, and finally the facade; it never creates a GitHub Release. If a job partially completes, manually dispatch **Publish crates** on `main` as described below.
 
 Before `1.0.0`, fixes increment the patch version; features and breaking changes increment the minor version. Breaking changes must still be called out in commit messages. Once the project reaches `1.0.0`, normal semantic-versioning rules apply.
 
-Default `GITHUB_TOKEN` events do not trigger most other GitHub Actions workflows. This workflow does not emit release/tag events at all. A future publishing workflow must not depend on such events. Use an explicitly designed publishing job or manual dispatch if publishing automation is added later; do not add a broader token merely to run this workflow.
+Default `GITHUB_TOKEN` events do not trigger most other GitHub Actions workflows. This workflow does not emit release/tag events at all. The separate publishing workflow listens to pushes to `main` that change the version manifest, not tag or release events. Human merges of version PRs produce such pushes; do not add a broader GitHub token merely to chain workflows.
+
+## Automatic crates.io publishing
+
+The independent [Publish crates workflow](../.github/workflows/publish-crates.yml) runs when a push to `main` changes `.release-please-manifest.json`. The empty initial manifest is skipped. It requires the latest manifest commit to belong to a merged Release Please PR targeting `main`, with the matching generated branch and version title; editing a manifest in an ordinary PR cannot trigger publication. For recovery, manual dispatch is supported only on `main`.
+
+Configure a GitHub Actions repository secret named **`CARGO_REGISTRY_TOKEN`** before merging the first generated version PR. Store the credential directly in GitHub's Secrets UI, never in chat, source, or shell arguments. Its crates.io account must have a verified email, be allowed to create the five package names for their first publication, and own the crates or have the necessary team permissions for updates. Use the narrowest available publish scopes for these exact names. A name being unclaimed is not a reservation; authorization and name availability are enforced by crates.io at publication time. The workflow does not provision credentials, modify owners, or change repository settings.
+
+The prepare job has read-only repository/PR permissions. The publish job checks out the exact version PR commit, not the latest `main` code. It installs Rust 1.85.0, validates all five package versions, seven internal dependency requirements, lockfile, changelog, registry restrictions, licenses and notices, then runs all-feature and no-default-feature tests and strict rustdoc. Registry credentials are present only in the final tag/upload step. Missing registry credentials stop the workflow before creating a tag.
+
+The final step creates a lightweight `vX.Y.Z` tag at that exact commit using the built-in `GITHUB_TOKEN`. An existing lightweight or annotated tag is accepted only if it resolves to the same commit; no tag is moved or replaced. It then publishes these packages sequentially with `cargo publish --locked --registry crates-io`:
+
+1. `tencentcloud-sdk-core`
+2. `tencentcloud-sdk-cos`
+3. `tencentcloud-sdk-ses`
+4. `tencentcloud-sdk-ssm`
+5. `tencentcloud-sdk`
+
+Each uploaded archive must contain matching source-commit metadata, LICENSE, and third-party notices. The workflow verifies its SHA-256 against the crates.io sparse index and waits up to 30 index checks (10 seconds apart) before moving to a dependent package. Neither workflow creates a GitHub Release. The publishing workflow is serialized and is never cancelled by a newer version push.
+
+### Recovery
+
+Git tags and registry uploads are not atomic: a tag and some crates can remain if a later upload fails. Do not delete/move that tag or overwrite a registry version. Manually dispatch **Publish crates** on `main` before merging another version PR. It finds the latest version-manifest commit even if unrelated code has subsequently landed on `main`. Existing registry versions are packaged again and skipped only when their checksums match the local archive exactly; a mismatch or yanked version fails closed. Crates.io versions cannot be overwritten. Cargo failures are not blindly retried; a maintainer initiates a new run after inspecting the cause.
+
+Manual dispatch always targets the latest manifest version, not an arbitrary old release. If a newer version PR is merged before a previous partial publication is recovered, recovering the older version requires a separately reviewed process. Do not mark such an incomplete release as successfully published.
 
 ## Local automation checks
 
@@ -38,12 +62,14 @@ npm install --prefix target/release-please-check --no-audit --no-fund --ignore-s
 NODE_PATH="$PWD/target/release-please-check/node_modules" node scripts/check-release-please.cjs
 ```
 
-Run `actionlint .github/workflows/release-please.yml` separately to validate GitHub Actions syntax and expressions. These checks do not create PRs, GitHub Releases, tags, or registry uploads. The first real workflow run on `main` remains the end-to-end verification of repository permissions and GitHub integration.
+Run `python3 scripts/test-publish-crates.py` for the standard-library-only publishing regressions (no network, tags, or uploads). These cover version PR provenance, snapshot/version validation, tag conflicts, dependency order, index delays/timeouts, credential guards, partial-publication recovery checksums, and archive notices/source commit.
+
+Run `actionlint .github/workflows/release-please.yml .github/workflows/publish-crates.yml` separately to validate GitHub Actions syntax and expressions. These checks do not create PRs, GitHub Releases, tags, or registry uploads. The first real workflow run on `main` remains the end-to-end verification of repository permissions and GitHub integration.
 
 ## Boundaries
 
 - This workflow creates or updates version/changelog PRs only. It never creates tags or GitHub Releases. It never merges its own PRs or runs `cargo publish`.
-- All crates retain `publish = false` until the publishing metadata, SDK license, packaged notices, and registry availability have been reviewed separately.
+- All five crates are explicitly restricted to the `crates-io` registry and inherit Apache-2.0 and the repository URL. Each package includes its license, third-party notices, and readme.
 - The workflow checks out the automation scripts, but requires no Rust toolchain, cloud credentials, or access to Tencent Cloud APIs.
 - Concurrent runs are serialized per ref and are not cancelled halfway through release operations.
 

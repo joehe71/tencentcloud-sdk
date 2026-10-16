@@ -54,6 +54,31 @@ assert.deepEqual(job.steps[2].env, {GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}
 assert(job.steps[2].run.includes('node scripts/release-please-pr.cjs'));
 assert(!job.steps.some(step => /github-release|cargo publish|git tag/.test(step.run || '')));
 
+const publishing = YAML.parse(read('.github/workflows/publish-crates.yml'));
+assert.deepEqual(Object.keys(publishing.on).sort(), ['push', 'workflow_dispatch']);
+assert.deepEqual(publishing.on.push.branches, ['main']);
+assert.deepEqual(publishing.on.push.paths, ['.release-please-manifest.json']);
+assert.deepEqual(publishing.permissions, {contents: 'read'});
+assert.equal(publishing.concurrency['cancel-in-progress'], false);
+const preparation = publishing.jobs.prepare;
+assert.equal(preparation.if, "github.ref == 'refs/heads/main'");
+assert.deepEqual(preparation.permissions, {contents: 'read', 'pull-requests': 'read'});
+assert.equal(preparation.steps[0].with['fetch-depth'], 0);
+assert.equal(preparation.steps[0].with['persist-credentials'], false);
+const publication = publishing.jobs.publish;
+assert.equal(publication.needs, 'prepare');
+assert.equal(publication.if, "needs.prepare.outputs.ready == 'true'");
+assert.deepEqual(publication.permissions, {contents: 'write'});
+assert.equal(publication.steps[0].with.ref, '${{ needs.prepare.outputs.sha }}');
+for (const step of [...preparation.steps, ...publication.steps]) {
+  if (step.uses) assert.match(step.uses, /^actions\/checkout@[0-9a-f]{40}$/);
+}
+const upload = publication.steps.at(-1);
+assert.equal(upload.env.CARGO_REGISTRY_TOKEN, '${{ secrets.CARGO_REGISTRY_TOKEN }}');
+assert.equal(upload.env.GH_TOKEN, '${{ secrets.GITHUB_TOKEN }}');
+assert(upload.run.includes('scripts/publish-crates.py publish'));
+assert(!publication.steps.slice(0, -1).some(step => JSON.stringify(step).includes('CARGO_REGISTRY_TOKEN')));
+
 const workspace = parseCargoManifest(read('Cargo.toml'));
 const paths = ['Cargo.toml', ...workspace.workspace.members.map(member => `${member}/Cargo.toml`)];
 const names = new Set(paths.map(path => parseCargoManifest(read(path)).package.name));

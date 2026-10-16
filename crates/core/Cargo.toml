@@ -3,7 +3,11 @@ name = "tencentcloud-sdk-core"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-publish = false
+publish = ["crates-io"]
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+include = ["src/**", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md"]
 description = "Client, TC3 signing, and transport core for Tencent Cloud API 3.0"
 
 [features]
