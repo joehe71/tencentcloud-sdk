@@ -4,7 +4,7 @@ use http::{HeaderMap, HeaderName, HeaderValue};
 
 use crate::SdkError;
 
-/// 经过验证的操作描述。静态产品字段可借用字符串字面量，无运行时注册表。
+/// A validated operation descriptor that can borrow static service fields without a runtime registry.
 #[derive(Clone, Debug)]
 pub struct Operation {
     service: Cow<'static, str>,
@@ -13,10 +13,10 @@ pub struct Operation {
 }
 
 impl Operation {
-    /// 指定产品、API 日期版本和官方 Action。
+    /// Specifies the service, API date version, and official action.
     ///
     /// # Errors
-    /// 标识含非法字符或版本不是 YYYY-MM-DD 格式时返回错误。
+    /// Returns an error for invalid identifiers or a version not in YYYY-MM-DD format.
     pub fn new(
         service: impl Into<Cow<'static, str>>,
         version: impl Into<Cow<'static, str>>,
@@ -38,29 +38,33 @@ impl Operation {
                 }
             })
         {
-            return Err(SdkError::Configuration("API 版本必须使用 YYYY-MM-DD 格式"));
+            return Err(SdkError::Configuration(
+                "API version must use YYYY-MM-DD format",
+            ));
         }
         if operation.action.is_empty()
             || operation.action.len() > 128
             || !operation.action.bytes().all(|c| c.is_ascii_alphanumeric())
             || !operation.action.as_bytes()[0].is_ascii_alphabetic()
         {
-            return Err(SdkError::Configuration("Action 必须是有效的 ASCII 标识"));
+            return Err(SdkError::Configuration(
+                "action must be a valid ASCII identifier",
+            ));
         }
         Ok(operation)
     }
 
-    /// 产品标识，例如 cvm。
+    /// Returns the service identifier, such as cvm.
     #[must_use]
     pub fn service(&self) -> &str {
         &self.service
     }
-    /// API 日期版本，例如 2017-03-12。
+    /// Returns the API date version, such as 2017-03-12.
     #[must_use]
     pub fn version(&self) -> &str {
         &self.version
     }
-    /// 官方 Action，保留大小写。
+    /// Returns the official action with its original case.
     #[must_use]
     pub fn action(&self) -> &str {
         &self.action
@@ -76,7 +80,9 @@ pub(crate) fn validate_service(service: &str) -> Result<(), SdkError> {
             .bytes()
             .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-')
     {
-        return Err(SdkError::Configuration("产品标识必须为小写 ASCII 域名标签"));
+        return Err(SdkError::Configuration(
+            "service identifier must be a lowercase ASCII domain label",
+        ));
     }
     Ok(())
 }
@@ -88,18 +94,18 @@ pub(crate) fn validate_region(region: &str) -> Result<(), SdkError> {
             .bytes()
             .all(|c| c.is_ascii_alphanumeric() || c == b'-')
     {
-        return Err(SdkError::Configuration("Region 无效"));
+        return Err(SdkError::Configuration("invalid region"));
     }
     Ok(())
 }
 
-/// 腾讯云公共语言参数。
+/// The Tencent Cloud common language parameter.
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 pub enum Language {
-    /// 简体中文。
+    /// Simplified Chinese.
     ZhCn,
-    /// 英文。
+    /// English.
     EnUs,
 }
 
@@ -112,7 +118,7 @@ impl Language {
     }
 }
 
-/// 单次调用选项，不修改共享 Client。Header 的调试输出保持脱敏。
+/// Per-call options that do not mutate the shared client; headers are omitted from debug output.
 #[derive(Clone, Default)]
 pub struct RequestOptions {
     pub(crate) region: Option<String>,
@@ -122,28 +128,28 @@ pub struct RequestOptions {
 }
 
 impl RequestOptions {
-    /// 覆盖本次请求的 Region；在执行前验证。
+    /// Overrides the region for this request; validated before execution.
     #[must_use]
     pub fn region(mut self, region: impl Into<String>) -> Self {
         self.region = Some(region.into());
         self
     }
-    /// 覆盖本次调用预算，覆盖凭证获取、发送及响应体读取。
+    /// Overrides the call budget, including credentials, sending, and response body collection.
     #[must_use]
     pub fn timeout(mut self, timeout: Duration) -> Self {
         self.timeout = Some(timeout);
         self
     }
-    /// 指定响应语言。
+    /// Sets the response language.
     #[must_use]
     pub fn language(mut self, language: Language) -> Self {
         self.language = Some(language);
         self
     }
-    /// 增加自定义 Header；同名 Header 后值覆盖前值。
+    /// Adds a custom header, replacing any previous value with the same name.
     ///
     /// # Errors
-    /// 尝试覆盖签名、公共参数、传输编码等受保护 Header 时返回错误。
+    /// Returns an error when overriding protected signing, common-parameter, or transport headers.
     pub fn header(mut self, name: HeaderName, value: HeaderValue) -> Result<Self, SdkError> {
         let name_str = name.as_str();
         if (name_str.starts_with("x-tc-") && name_str != "x-tc-traceid")
@@ -162,7 +168,9 @@ impl RequestOptions {
                     | "upgrade"
             )
         {
-            return Err(SdkError::Configuration("不能覆盖受保护的 HTTP Header"));
+            return Err(SdkError::Configuration(
+                "protected HTTP headers cannot be overridden",
+            ));
         }
         self.headers.insert(name, value);
         Ok(self)

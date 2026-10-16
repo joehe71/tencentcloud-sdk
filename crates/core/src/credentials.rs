@@ -4,9 +4,32 @@ use http::HeaderValue;
 
 use crate::{BoxFuture, SdkError};
 
-/// 不可变的凭证快照。默认格式化始终脱敏。
+#[cfg(feature = "credentials-file")]
+mod profile;
+#[cfg(feature = "credentials-file")]
+pub use profile::ProfileCredentialsProvider;
+
+#[cfg(feature = "credentials-roles")]
+mod cache;
+#[cfg(feature = "credentials-roles")]
+mod chain;
+#[cfg(feature = "credentials-roles")]
+mod role_http;
+#[cfg(feature = "credentials-roles")]
+mod roles;
+#[cfg(feature = "credentials-roles")]
+pub use chain::DefaultCredentialsProvider;
+#[cfg(feature = "credentials-roles")]
+pub use role_http::RoleProviderOptions;
+#[cfg(feature = "credentials-roles")]
+pub use roles::{
+    AssumeRoleConfig, AssumeRoleCredentialsProvider, CvmRoleCredentialsProvider, OidcRoleConfig,
+    OidcRoleCredentialsProvider, WebIdentityToken,
+};
+
+/// An immutable credentials snapshot with redacted default formatting.
 ///
-/// 多个签名字段必须来自同一个快照，不能分别读取可刷新的来源。
+/// All signing fields must come from one snapshot, not separate reads of a refreshable source.
 pub struct Credentials {
     secret_id: String,
     secret_key: String,
@@ -14,10 +37,10 @@ pub struct Credentials {
 }
 
 impl Credentials {
-    /// 构造长期凭证，不访问网络。
+    /// Creates long-lived credentials without network access.
     ///
     /// # Errors
-    /// `SecretId` 或 `SecretKey` 为空、`SecretId` 不符合 Header 安全字符要求时返回错误。
+    /// Returns an error if either secret is empty or `SecretId` contains characters unsafe for headers.
     pub fn new(
         secret_id: impl Into<String>,
         secret_key: impl Into<String>,
@@ -30,7 +53,9 @@ impl Credentials {
                 .all(|c| c.is_ascii_alphanumeric() || matches!(c, b'_' | b'-'))
             || secret_key.is_empty()
         {
-            return Err(SdkError::Credentials("SecretId 或 SecretKey 缺失或无效"));
+            return Err(SdkError::Credentials(
+                "SecretId or SecretKey is missing or invalid",
+            ));
         }
         Ok(Self {
             secret_id,
@@ -39,16 +64,18 @@ impl Credentials {
         })
     }
 
-    /// 添加临时凭证 Token。
+    /// Adds a temporary credentials token.
     ///
     /// # Errors
-    /// Token 为空或无法作为 HTTP Header 值时返回错误。
+    /// Returns an error if the token is empty or invalid as an HTTP header value.
     pub fn with_token(mut self, token: impl AsRef<str>) -> Result<Self, SdkError> {
         if token.as_ref().is_empty() {
-            return Err(SdkError::Credentials("临时凭证 Token 不能为空"));
+            return Err(SdkError::Credentials(
+                "temporary credentials token must not be empty",
+            ));
         }
         let mut token = HeaderValue::from_str(token.as_ref())
-            .map_err(|_| SdkError::Credentials("临时凭证 Token 无效"))?;
+            .map_err(|_| SdkError::Credentials("invalid temporary credentials token"))?;
         token.set_sensitive(true);
         self.token = Some(token);
         Ok(self)
@@ -71,18 +98,18 @@ impl fmt::Debug for Credentials {
     }
 }
 
-/// 可替换的异步凭证来源。实现者负责刷新、缓存和有效期检查。
+/// A replaceable asynchronous credentials source responsible for refresh, caching, and expiration checks.
 pub trait ProvideCredentials: Send + Sync {
-    /// 返回当前有效的一致快照；失败不得输出凭证原文。
+    /// Returns a consistent, currently valid snapshot; failures must not expose credentials.
     fn provide_credentials(&self) -> BoxFuture<'_, Result<Arc<Credentials>, SdkError>>;
 }
 
-/// 共享一个静态快照，不逐请求复制密钥字符串。
+/// Shares a static snapshot without copying secret strings for each request.
 #[derive(Clone, Debug)]
 pub struct StaticCredentialsProvider(Arc<Credentials>);
 
 impl StaticCredentialsProvider {
-    /// 包装调用方显式提供的凭证。
+    /// Wraps credentials explicitly supplied by the caller.
     #[must_use]
     pub fn new(credentials: Credentials) -> Self {
         Self(Arc::new(credentials))
@@ -95,22 +122,22 @@ impl ProvideCredentials for StaticCredentialsProvider {
     }
 }
 
-/// 在显式加载时读取环境变量，此后只返回共享快照。
+/// Reads environment variables on explicit load, then returns a shared snapshot.
 #[derive(Clone, Debug)]
 pub struct EnvironmentCredentialsProvider(StaticCredentialsProvider);
 
 impl EnvironmentCredentialsProvider {
-    /// 读取 `TENCENTCLOUD_SECRET_ID`、`TENCENTCLOUD_SECRET_KEY` 和可选的 `TENCENTCLOUD_TOKEN`。
+    /// Loads `TENCENTCLOUD_SECRET_ID`, `TENCENTCLOUD_SECRET_KEY`, and optional `TENCENTCLOUD_TOKEN`.
     ///
     /// # Errors
-    /// 缺少必要变量、变量不是有效 Unicode 或凭证无效时返回错误。
+    /// Returns an error for missing required variables, invalid Unicode, or invalid credentials.
     pub fn load() -> Result<Self, SdkError> {
         Self::from_lookup(|name| match env::var(name) {
             Ok(value) => Ok(Some(value)),
             Err(env::VarError::NotPresent) => Ok(None),
-            Err(env::VarError::NotUnicode(_)) => {
-                Err(SdkError::Credentials("环境凭证不是有效 Unicode"))
-            }
+            Err(env::VarError::NotUnicode(_)) => Err(SdkError::Credentials(
+                "environment credentials are not valid Unicode",
+            )),
         })
     }
 
@@ -118,9 +145,9 @@ impl EnvironmentCredentialsProvider {
         mut lookup: impl FnMut(&str) -> Result<Option<String>, SdkError>,
     ) -> Result<Self, SdkError> {
         let id = lookup("TENCENTCLOUD_SECRET_ID")?
-            .ok_or(SdkError::Credentials("缺少 TENCENTCLOUD_SECRET_ID"))?;
+            .ok_or(SdkError::Credentials("missing TENCENTCLOUD_SECRET_ID"))?;
         let key = lookup("TENCENTCLOUD_SECRET_KEY")?
-            .ok_or(SdkError::Credentials("缺少 TENCENTCLOUD_SECRET_KEY"))?;
+            .ok_or(SdkError::Credentials("missing TENCENTCLOUD_SECRET_KEY"))?;
         let mut credentials = Credentials::new(id, key)?;
         if let Some(token) = lookup("TENCENTCLOUD_TOKEN")? {
             credentials = credentials.with_token(token)?;

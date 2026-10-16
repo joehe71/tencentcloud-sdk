@@ -6,18 +6,20 @@ use reqwest::{Client, redirect::Policy, retry};
 use super::{Transport, TransportRequest, TransportResponse};
 use crate::{BoxFuture, SdkError};
 
-/// 共享 reqwest 连接池的默认实现。关闭重定向、自动重试和环境代理。
+/// The default shared reqwest connection pool with redirects, automatic retries, and environment proxies disabled.
 #[derive(Clone)]
 pub struct ReqwestTransport(Client);
 
 impl ReqwestTransport {
-    /// 使用 Rustls 创建连接池；连接超时必须非零。
+    /// Creates a connection pool using Rustls with a nonzero connection timeout.
     ///
     /// # Errors
-    /// 超时配置无效或 TLS/HTTP 客户端初始化失败时返回错误。
+    /// Returns an error for an invalid timeout or TLS/HTTP client initialization failure.
     pub fn new(connect_timeout: Duration) -> Result<Self, SdkError> {
         if connect_timeout.is_zero() {
-            return Err(SdkError::Configuration("连接超时必须大于零"));
+            return Err(SdkError::Configuration(
+                "connection timeout must be greater than zero",
+            ));
         }
         let client = Client::builder()
             .connect_timeout(connect_timeout)

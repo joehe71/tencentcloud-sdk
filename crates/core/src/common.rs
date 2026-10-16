@@ -4,7 +4,7 @@ use serde::{Serialize, de::DeserializeOwned};
 
 use crate::{ApiResponse, Client, Operation, RequestOptions, SdkError};
 
-/// 持有固定产品和版本的通用入口，不依赖产品模型。
+/// A generic client bound to a service and API version, independent of product models.
 #[derive(Clone)]
 pub struct CommonClient {
     client: Client,
@@ -13,10 +13,10 @@ pub struct CommonClient {
 }
 
 impl CommonClient {
-    /// 绑定产品与 API 版本，共享 Client 的资源。
+    /// Binds a service and API version while sharing the client's resources.
     ///
     /// # Errors
-    /// 产品或版本无效时返回配置错误。
+    /// Returns a configuration error if the service or version is invalid.
     pub fn new(
         client: Client,
         service: impl Into<Cow<'static, str>>,
@@ -32,10 +32,10 @@ impl CommonClient {
         })
     }
 
-    /// 使用默认选项发起一次 POST JSON 调用。
+    /// Makes one POST JSON call with default options.
     ///
     /// # Errors
-    /// 参数、凭证、签名、传输或腾讯云响应错误时返回对应分类。
+    /// Returns the corresponding input, credential, signing, transport, or Tencent Cloud response error.
     pub async fn call<I: Serialize + Sync + ?Sized, O: DeserializeOwned>(
         &self,
         action: &str,
@@ -45,10 +45,10 @@ impl CommonClient {
             .await
     }
 
-    /// 使用单次请求选项调用，不修改共享 Client。
+    /// Calls with per-request options without mutating the shared client.
     ///
     /// # Errors
-    /// 参数、凭证、签名、传输或腾讯云响应错误时返回对应分类。
+    /// Returns the corresponding input, credential, signing, transport, or Tencent Cloud response error.
     pub async fn call_with_options<I: Serialize + Sync + ?Sized, O: DeserializeOwned>(
         &self,
         action: &str,

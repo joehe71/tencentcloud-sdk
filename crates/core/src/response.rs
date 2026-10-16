@@ -1,21 +1,21 @@
 use http::StatusCode;
 
-/// 公共响应元数据，不额外保存完整响应体。
+/// Common response metadata without retaining an additional copy of the full response body.
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 pub struct ResponseMetadata {
-    /// 腾讯云 RequestId，优先来自 JSON，缺失时使用响应 Header。
+    /// The Tencent Cloud `RequestId`, taken from JSON or falling back to the response header.
     pub request_id: Option<String>,
-    /// HTTP 状态码。
+    /// The HTTP status code.
     pub status: StatusCode,
 }
 
-/// 拥有数据所有权的强类型响应。
+/// A strongly typed response that owns its data.
 #[derive(Debug)]
 #[non_exhaustive]
 pub struct ApiResponse<T> {
-    /// 解析后的 Response 业务对象。
+    /// The decoded business object inside Response.
     pub data: T,
-    /// 统一元数据。
+    /// Common response metadata.
     pub metadata: ResponseMetadata,
 }

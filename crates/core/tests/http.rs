@@ -1,4 +1,4 @@
-//! HTTP 适配器只连接数值回环地址的本地模拟服务，不调用腾讯云。
+//! HTTP adapter tests use local mock servers on numeric loopback addresses, never Tencent Cloud.
 
 #![cfg(feature = "transport-reqwest")]
 
@@ -19,14 +19,17 @@ async fn read_request(stream: &mut BufReader<TcpStream>) -> io::Result<(String, 
     loop {
         let mut line = String::new();
         if stream.read_line(&mut line).await? == 0 {
-            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "请求提前结束"));
+            return Err(io::Error::new(
+                io::ErrorKind::UnexpectedEof,
+                "request ended prematurely",
+            ));
         }
         if let Some((name, value)) = line.split_once(':') {
             if name.eq_ignore_ascii_case("content-length") {
                 length = value
                     .trim()
                     .parse()
-                    .map_err(|_| io::Error::other("无效请求长度"))?;
+                    .map_err(|_| io::Error::other("invalid request length"))?;
             }
         }
         let done = line == "\r\n";

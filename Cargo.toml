@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish = false
-description = "模块化的腾讯云 Rust SDK"
+description = "A modular Tencent Cloud SDK for Rust"
 
 [workspace]
 resolver = "3"
@@ -38,6 +38,8 @@ pedantic = "warn"
 
 [features]
 default = []
+credentials-file = ["tencentcloud-sdk-core/credentials-file"]
+credentials-roles = ["tencentcloud-sdk-core/credentials-roles"]
 transport-reqwest = ["tencentcloud-sdk-core/transport-reqwest"]
 
 [dependencies]

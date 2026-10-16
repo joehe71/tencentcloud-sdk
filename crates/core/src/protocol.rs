@@ -27,7 +27,9 @@ pub(crate) fn encode<I: Serialize + ?Sized>(input: &I, limit: usize) -> Result<B
         });
     }
     if writer.bytes.first() != Some(&b'{') {
-        return Err(SdkError::Configuration("API 请求必须编码为 JSON 对象"));
+        return Err(SdkError::Configuration(
+            "API requests must encode to JSON objects",
+        ));
     }
     Ok(Bytes::from(writer.bytes))
 }
@@ -42,7 +44,7 @@ impl Write for LimitedWriter {
     fn write(&mut self, input: &[u8]) -> io::Result<usize> {
         if input.len() > self.limit.saturating_sub(self.bytes.len()) {
             self.exceeded = true;
-            return Err(io::Error::other("请求体超限"));
+            return Err(io::Error::other("request body exceeds the size limit"));
         }
         self.bytes.extend_from_slice(input);
         Ok(input.len())
@@ -150,13 +152,16 @@ pub(crate) fn decode<O: DeserializeOwned>(
             .unwrap_or_default()
             .trim();
         if !content_type.eq_ignore_ascii_case("application/json") {
-            return Err(protocol_error("仅支持 JSON 响应", request_id));
+            return Err(protocol_error(
+                "only JSON responses are supported",
+                request_id,
+            ));
         }
     }
     let envelope: Envelope<'_> = serde_json::from_slice(&response.body)
-        .map_err(|_| protocol_error("缺少有效的 Response 外层", request_id.clone()))?;
+        .map_err(|_| protocol_error("missing or invalid Response envelope", request_id.clone()))?;
     let probe: Probe = serde_json::from_str(envelope.response.get())
-        .map_err(|_| protocol_error("Response 公共字段无效", request_id.clone()))?;
+        .map_err(|_| protocol_error("invalid common Response fields", request_id.clone()))?;
     if let Some(id) = probe.request_id.filter(|id| !id.is_empty()) {
         request_id = Some(id);
     }
@@ -170,12 +175,16 @@ pub(crate) fn decode<O: DeserializeOwned>(
     }
     if status != StatusCode::OK {
         return Err(protocol_error(
-            "HTTP 非 200 且未返回腾讯云错误对象",
+            "non-200 HTTP response without a Tencent Cloud error object",
             request_id,
         ));
     }
-    let data = serde_json::from_str(envelope.response.get())
-        .map_err(|_| protocol_error("业务响应不符合目标类型", request_id.clone()))?;
+    let data = serde_json::from_str(envelope.response.get()).map_err(|_| {
+        protocol_error(
+            "business response does not match the target type",
+            request_id.clone(),
+        )
+    })?;
     Ok(ApiResponse {
         data,
         metadata: ResponseMetadata { request_id, status },

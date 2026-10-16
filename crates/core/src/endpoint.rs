@@ -4,27 +4,27 @@ use http::Uri;
 
 use crate::SdkError;
 
-/// 验证过的 API 根端点，不能包含用户信息、查询串或任意路径。
+/// A validated API root endpoint without user information, query strings, or arbitrary paths.
 #[derive(Clone, Debug)]
 pub struct Endpoint(Uri);
 
 impl Endpoint {
-    /// 显式指定 HTTPS 根端点，例如 <https://cvm.ap-shanghai.tencentcloudapi.com/>。
+    /// Sets an explicit HTTPS root endpoint, such as <https://cvm.ap-shanghai.tencentcloudapi.com/>.
     ///
     /// # Errors
-    /// URL 不是 HTTPS 根端点时返回错误。
+    /// Returns an error if the URL is not an HTTPS root endpoint.
     pub fn https(url: &str) -> Result<Self, SdkError> {
         let endpoint = Self::parse(url)?;
         if endpoint.0.scheme_str() != Some("https") {
-            return Err(SdkError::Configuration("API 端点必须使用 HTTPS"));
+            return Err(SdkError::Configuration("API endpoint must use HTTPS"));
         }
         Ok(endpoint)
     }
 
-    /// 仅允许明文回环地址，供本地模拟服务测试使用，不允许任意明文公网端点。
+    /// Allows plaintext HTTP only for loopback addresses used by local mock servers.
     ///
     /// # Errors
-    /// URL 不是 HTTP 回环根端点时返回错误。
+    /// Returns an error if the URL is not an HTTP loopback root endpoint.
     pub fn loopback_http(url: &str) -> Result<Self, SdkError> {
         let endpoint = Self::parse(url)?;
         let host = endpoint.0.host().unwrap_or_default();
@@ -33,28 +33,32 @@ impl Endpoint {
             .trim_end_matches(']')
             .parse::<IpAddr>();
         if endpoint.0.scheme_str() != Some("http") || !ip.is_ok_and(|ip| ip.is_loopback()) {
-            return Err(SdkError::Configuration("明文 HTTP 仅允许数值回环地址"));
+            return Err(SdkError::Configuration(
+                "plaintext HTTP requires a numeric loopback address",
+            ));
         }
         Ok(endpoint)
     }
 
     fn parse(url: &str) -> Result<Self, SdkError> {
         if url.contains('#') {
-            return Err(SdkError::Configuration("API 端点不能包含片段"));
+            return Err(SdkError::Configuration(
+                "API endpoint must not contain a fragment",
+            ));
         }
         let uri: Uri = url
             .parse()
-            .map_err(|_| SdkError::Configuration("API 端点 URL 无效"))?;
+            .map_err(|_| SdkError::Configuration("invalid API endpoint URL"))?;
         let authority = uri
             .authority()
-            .ok_or(SdkError::Configuration("API 端点缺少主机"))?;
+            .ok_or(SdkError::Configuration("API endpoint has no host"))?;
         if authority.as_str().contains('@')
             || uri.host().is_none_or(str::is_empty)
             || !matches!(uri.path(), "" | "/")
             || uri.query().is_some()
         {
             return Err(SdkError::Configuration(
-                "API 端点必须为不含用户信息和查询串的根 URL",
+                "API endpoint must be a root URL without user information or a query string",
             ));
         }
         let uri = Uri::builder()
@@ -62,7 +66,7 @@ impl Endpoint {
             .authority(authority.as_str().to_ascii_lowercase())
             .path_and_query("/")
             .build()
-            .map_err(|_| SdkError::Configuration("API 端点 URL 无效"))?;
+            .map_err(|_| SdkError::Configuration("invalid API endpoint URL"))?;
         Ok(Self(uri))
     }
 
@@ -70,7 +74,7 @@ impl Endpoint {
         Self::https(&format!("https://{service}.tencentcloudapi.com/"))
     }
 
-    /// 取得已验证的 URI。
+    /// Returns the validated URI.
     #[must_use]
     pub fn uri(&self) -> &Uri {
         &self.0

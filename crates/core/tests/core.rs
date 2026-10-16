@@ -1,4 +1,4 @@
-//! 使用假凭证与 `MockTransport` 验证核心调用链，禁止真实网络访问。
+//! Tests the core execution path with fake credentials and a mock transport, without real network access.
 
 use std::{
     collections::VecDeque,
@@ -218,7 +218,7 @@ async fn service_error_is_preserved_even_on_http_503_and_never_retried() {
         .unwrap_err();
     assert!(!format!("{error:?} {error}").contains("private-business-data"));
     let SdkError::Service(error) = error else {
-        panic!("应保留服务错误")
+        panic!("service error must be preserved")
     };
     assert_eq!(error.code, "InternalError");
     assert_eq!(error.message, "private-business-data");
@@ -243,7 +243,7 @@ async fn malformed_responses_are_protocol_errors_with_header_request_id() {
             status, request_id, ..
         } = error
         else {
-            panic!("应返回协议错误")
+            panic!("expected a protocol error")
         };
         assert_eq!(status, StatusCode::BAD_GATEWAY);
         assert_eq!(request_id.as_deref(), Some("header-id"));
@@ -370,7 +370,8 @@ async fn fragmented_body_and_empty_chunks_decode_correctly() {
 
 #[tokio::test]
 async fn oversized_or_non_object_request_fails_before_transport() {
-    let mock = MockTransport::new(|_| async { panic!("无效输入不能发起传输") });
+    let mock =
+        MockTransport::new(|_| async { panic!("invalid input must not invoke the transport") });
     let client = builder(mock.clone()).max_request_body(4).build().unwrap();
     let result: Result<ApiResponse<Value>, _> = client
         .execute(&operation(), &json!({"Large":"payload"}))
@@ -422,7 +423,9 @@ impl ProvideCredentials for PendingCredentials {
 
 #[tokio::test(start_paused = true)]
 async fn timeout_covers_credentials_before_network() {
-    let mock = MockTransport::new(|_| async { panic!("凭证未就绪不能发起传输") });
+    let mock = MockTransport::new(|_| async {
+        panic!("transport must not run before credentials are ready")
+    });
     let client = builder(mock.clone())
         .credentials_provider(PendingCredentials)
         .timeout(Duration::from_millis(10))
@@ -497,7 +500,8 @@ async fn cloned_client_is_send_sync_and_supports_parallel_calls() {
 #[test]
 fn configuration_is_explicit_and_limits_must_be_nonzero() {
     assert!(Client::builder().build().is_err());
-    let mock = MockTransport::new(|_| async { panic!("构建阶段不能联网") });
+    let mock =
+        MockTransport::new(|_| async { panic!("building a client must not access the network") });
     assert!(
         builder(mock.clone())
             .timeout(Duration::ZERO)

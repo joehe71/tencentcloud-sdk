@@ -4,10 +4,12 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish = false
-description = "腾讯云 API 3.0 的客户端、TC3 签名和传输内核"
+description = "Client, TC3 signing, and transport core for Tencent Cloud API 3.0"
 
 [features]
 default = []
+credentials-file = ["tokio/fs", "tokio/io-util"]
+credentials-roles = ["credentials-file", "tokio/sync"]
 transport-reqwest = ["dep:reqwest", "dep:futures-util"]
 
 [dependencies]

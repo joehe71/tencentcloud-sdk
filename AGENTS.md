@@ -1,5 +1,9 @@
 # 空间工作规则
 
+## 代码语言
+
+- Code comments, Rust documentation comments, package descriptions, and SDK-generated diagnostic messages must be written in English. Preserve official service messages and protocol values verbatim; existing Chinese design documents may remain in Chinese.
+
 ## 用途与边界
 
 - 本空间用于开发腾讯云 SDK：编写、维护和测试腾讯云接口封装，不作为日常云资源运维入口。

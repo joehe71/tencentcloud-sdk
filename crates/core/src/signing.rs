@@ -17,10 +17,12 @@ pub(crate) fn authorization(
     timestamp: i64,
 ) -> Result<HeaderValue, SdkError> {
     if timestamp < 0 {
-        return Err(SdkError::Signing("签名时间不能早于 Unix epoch"));
+        return Err(SdkError::Signing(
+            "signing time must not be before the Unix epoch",
+        ));
     }
     let date = OffsetDateTime::from_unix_timestamp(timestamp)
-        .map_err(|_| SdkError::Signing("签名时间超出有效范围"))?
+        .map_err(|_| SdkError::Signing("signing time is out of range"))?
         .date()
         .to_string();
     let canonical = format!(
@@ -43,14 +45,14 @@ pub(crate) fn authorization(
     let mut header = HeaderValue::from_str(&format!(
         "TC3-HMAC-SHA256 Credential={}/{scope}, SignedHeaders={SIGNED_HEADERS}, Signature={signature}",
         credentials.secret_id(),
-    )).map_err(|_| SdkError::Signing("无法构造 Authorization"))?;
+    )).map_err(|_| SdkError::Signing("failed to construct Authorization"))?;
     header.set_sensitive(true);
     Ok(header)
 }
 
 fn hmac256(key: &[u8], data: &[u8]) -> Result<[u8; 32], SdkError> {
-    let mut mac =
-        Hmac::<Sha256>::new_from_slice(key).map_err(|_| SdkError::Signing("无法初始化 HMAC"))?;
+    let mut mac = Hmac::<Sha256>::new_from_slice(key)
+        .map_err(|_| SdkError::Signing("failed to initialize HMAC"))?;
     mac.update(data);
     Ok(mac.finalize().into_bytes().into())
 }
@@ -75,7 +77,7 @@ mod tests {
 
     #[test]
     fn fixed_vector_matches_independent_python_implementation() {
-        // 按官方 TC3 步骤，以假凭证由 Python hashlib/hmac 独立计算预期值。
+        // Compute the expected value independently with Python hashlib/hmac and fake credentials using the official TC3 steps.
         let credentials = Credentials::new("test-id", "test-key").unwrap();
         let header = authorization(
             &credentials,

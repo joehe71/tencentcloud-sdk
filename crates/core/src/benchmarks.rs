@@ -1,4 +1,4 @@
-//! 显式运行的内部离线基准，调用实际内核实现，不向公开 API 暴露测试入口。
+//! Explicitly invoked offline benchmarks of actual core implementations without public test APIs.
 
 use std::{hint::black_box, path::Path, time::Duration};
 
@@ -214,18 +214,18 @@ fn shared_resource_benchmarks(criterion: &mut Criterion) {
 
 #[cfg(debug_assertions)]
 fn require_release() {
-    panic!("请使用 --release 运行性能基准");
+    panic!("run performance benchmarks with --release");
 }
 
 #[cfg(not(debug_assertions))]
 fn require_release() {}
 
 #[test]
-#[ignore = "离线性能基准；需 --release 并显式传入 --ignored，默认测试不计时"]
+#[ignore = "offline benchmarks; require --release and explicit --ignored; excluded from default test runs"]
 fn core_performance_baseline() {
     require_release();
     let directory = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/criterion-core");
-    // 不从 libtest 参数解析 Criterion CLI，避免 --ignored 等参数冲突。
+    // Do not parse libtest arguments as Criterion CLI options; flags such as --ignored would conflict.
     let mut criterion = Criterion::default()
         .without_plots()
         .sample_size(50)

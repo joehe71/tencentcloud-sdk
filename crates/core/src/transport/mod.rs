@@ -15,19 +15,19 @@ mod reqwest;
 #[cfg(feature = "transport-reqwest")]
 pub use reqwest::ReqwestTransport;
 
-/// 按需读取的响应字节流；错误不得包含凭证或原始响应体。
+/// An on-demand response byte stream; errors must not expose credentials or raw response bodies.
 pub type ResponseBody = Pin<Box<dyn Stream<Item = Result<Bytes, SdkError>> + Send + 'static>>;
 
-/// 已签名的 HTTP 请求。传输实现不得重编码 body、修改签名字段或自动重放。
+/// A signed HTTP request; transports must not re-encode its body, alter signed fields, or replay it automatically.
 #[derive(Clone)]
 pub struct TransportRequest {
-    /// HTTP 方法；当前核心仅产生 POST。
+    /// The HTTP method; business calls use POST and credential metadata reads use GET.
     pub method: Method,
-    /// 已验证的目标 URI。
+    /// The validated target URI.
     pub uri: Uri,
-    /// 公共参数、认证与用户 Header。
+    /// Common parameters, authentication, and user-supplied headers.
     pub headers: HeaderMap,
-    /// 与签名一致的精确字节体。
+    /// The exact body bytes used for signing.
     pub body: Bytes,
 }
 
@@ -41,18 +41,18 @@ impl fmt::Debug for TransportRequest {
     }
 }
 
-/// 传输响应，响应体通过异步 Stream 读取而非无界聚合。
+/// A transport response whose body is streamed asynchronously instead of collected without bounds.
 pub struct TransportResponse {
-    /// HTTP 状态码。
+    /// The HTTP status code.
     pub status: StatusCode,
-    /// HTTP 响应 Header。
+    /// The HTTP response headers.
     pub headers: HeaderMap,
-    /// 响应体；丢弃时应释放底层网络资源。
+    /// The response body; dropping it must release underlying network resources.
     pub body: ResponseBody,
 }
 
 impl TransportResponse {
-    /// 由已经缓冲的字节构造响应，方便实现 `MockTransport`。
+    /// Creates a response from buffered bytes, useful for implementing a mock transport.
     #[must_use]
     pub fn from_bytes(status: StatusCode, headers: HeaderMap, body: impl Into<Bytes>) -> Self {
         Self {
@@ -72,9 +72,9 @@ impl Stream for OneChunk {
     }
 }
 
-/// 可替换 HTTP 边界。自定义实现负责禁止重定向与自动重试，遵守请求字节不变约束。
+/// A replaceable HTTP boundary; implementations must disable redirects and automatic retries and preserve request bytes.
 pub trait Transport: Send + Sync {
-    /// 发送一次请求；future 或 body 被丢弃时释放资源，不遗留 detached 业务任务。
+    /// Sends once; dropping the future or body must release resources without leaving detached business tasks.
     fn send(&self, request: TransportRequest)
     -> BoxFuture<'_, Result<TransportResponse, SdkError>>;
 }
