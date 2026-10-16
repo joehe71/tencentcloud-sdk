@@ -14,6 +14,17 @@ The script runs `cargo llvm-cov --workspace --all-features --locked --fail-under
 
 The only source exclusions are files below `tests/` and the offline `benchmarks.rs` harness. Internal unit tests live under `crates/core/src/tests/`; they retain access to private implementation details but their code is excluded from the coverage denominator. No production module is excluded or marked as coverage-ignored. The facade has no executable statements to count.
 
+## Pull request checks
+
+The `PR checks` workflow runs for every pull request when it is opened, updated with new commits, reopened, or marked ready for review, without branch or path filters. New commits cancel superseded runs for the same PR.
+
+- `Tests and coverage (Rust 1.85)` runs workspace tests and documentation examples with all features, tests without default features, and this coverage gate on Ubuntu with Rust 1.85.0 and matching LLVM tools. It installs the pinned `cargo-llvm-cov` 0.8.7 tool with stable Rust separately from the SDK's minimum supported toolchain. The gate reuses `scripts/check-coverage.sh` unchanged: at least 90% aggregate production-line coverage, excluding only tests and benchmarks.
+- `Clippy (stable)` runs independently with `cargo clippy --workspace --all-targets --all-features --locked -- -D warnings`. Workspace lint configuration applies; warnings fail the check.
+
+Both jobs use the committed lockfile, read-only repository permissions, no persisted checkout credentials, and no cloud or publishing secrets. SDK tests use only fake credentials, mocks, or local loopback servers. Installing Rust tooling and downloading dependencies require network access; the tests do not call Tencent Cloud APIs. A failed test, insufficient coverage, or a Clippy warning fails its corresponding check.
+
+This workflow reports PR check results but does not change branch protection or require them for merging. Requiring successful checks before merging is a separate repository administration setting.
+
 ## SSM addition (2026-10-16)
 
 With COS, SES and SSM enabled, workspace production-line coverage is **95.72%** (2,793 / 2,918), function coverage **92.20%** (461 / 500), and region coverage **86.19%** (1,541 / 1,788), under the same Rust 1.85.0/LLVM setup. All measured SSM implementation lines are covered; no production exclusions were added. There are 276 passing offline tests plus five compile-only documentation examples. SSM adds 54 separate model tests, 24 action-routing tests and seven hand-written scenario tests covering secret/SSH redaction, binary pass-through, explicit encryption parameters, no hidden read cache, deletion/error non-replay, page options, bounded bodies and malformed responses. Line coverage is not branch coverage; macro/derive source-mapping caveats remain unchanged.

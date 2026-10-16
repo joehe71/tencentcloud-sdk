@@ -146,7 +146,7 @@ fn decode_benchmarks(criterion: &mut Criterion) {
         };
         assert_eq!(response.body.len(), size);
         let decoded: ApiResponse<Payload> = protocol::decode(&response).unwrap();
-        assert!(!decoded.data.data.is_empty());
+        assert_ne!(decoded.data.data, "");
         group.throughput(Throughput::Bytes(u64::try_from(size).unwrap()));
         group.bench_with_input(
             BenchmarkId::from_parameter(size),
