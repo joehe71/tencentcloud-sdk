@@ -10,3 +10,6 @@ pub use tencentcloud_sdk_core::{credentials, runtime, transport};
 
 #[cfg(feature = "cos")]
 pub use tencentcloud_sdk_cos as cos;
+
+#[cfg(feature = "ses")]
+pub use tencentcloud_sdk_ses as ses;
