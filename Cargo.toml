@@ -1,6 +1,6 @@
 [package]
 name = "tencentcloud-sdk"
-version.workspace = true
+version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 publish = false
@@ -11,7 +11,6 @@ resolver = "3"
 members = ["crates/core", "crates/cos", "crates/ses", "crates/ssm"]
 
 [workspace.package]
-version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
 

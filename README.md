@@ -87,6 +87,10 @@ bash scripts/check-coverage.sh
 
 最低 Rust 版本 **1.85.0** 已在 macOS ARM 上验证。离线性能基准使用 release 配置，显式运行，不进入默认测试或 SDK 运行时依赖；环境、结果和复现命令见 [实测报告](docs/validation.md)。
 
+## Releases
+
+Release Please manages the shared workspace version, [changelog](CHANGELOG.md), GitHub Releases, and `vX.Y.Z` tags. Crates.io publishing remains manual and disabled until its prerequisites are complete. See the [release guide](docs/releases.md) for repository setup and the maintainer workflow.
+
 ## 设计文档
 
 - [Credentials guide](docs/credentials.md)
