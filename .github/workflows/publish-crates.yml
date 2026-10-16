@@ -68,7 +68,7 @@ jobs:
           cargo test --workspace --all-features --locked
           cargo test --workspace --no-default-features --locked
           cargo doc --workspace --all-features --no-deps --locked
-      - name: Tag the snapshot and publish in dependency order
+      - name: Tag the snapshot, create a GitHub Release, and publish crates
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
