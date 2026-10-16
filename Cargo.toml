@@ -1,0 +1,49 @@
+[package]
+name = "tencentcloud-sdk"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+description = "A modular Tencent Cloud SDK for Rust"
+
+[workspace]
+resolver = "3"
+members = ["crates/core"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+
+[workspace.dependencies]
+bytes = "1"
+futures-core = "0.3"
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+hmac = "0.12"
+http = "1"
+reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls", "stream", "http2"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+sha2 = "0.10"
+time = { version = "0.3", default-features = false, features = ["std"] }
+tokio = { version = "1", default-features = false, features = ["time"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+all = "warn"
+pedantic = "warn"
+
+[features]
+default = []
+credentials-file = ["tencentcloud-sdk-core/credentials-file"]
+credentials-roles = ["tencentcloud-sdk-core/credentials-roles"]
+transport-reqwest = ["tencentcloud-sdk-core/transport-reqwest"]
+
+[dependencies]
+tencentcloud-sdk-core = { version = "0.1.0", path = "crates/core", default-features = false }
+
+[lints]
+workspace = true

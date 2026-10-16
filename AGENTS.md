@@ -1,9 +1,14 @@
 # 空间工作规则
 
+## 代码语言
+
+- Code comments, Rust documentation comments, package descriptions, and SDK-generated diagnostic messages must be written in English. Preserve official service messages and protocol values verbatim; existing Chinese design documents may remain in Chinese.
+
 ## 用途与边界
 
 - 本空间用于开发腾讯云 SDK：编写、维护和测试腾讯云接口封装，不作为日常云资源运维入口。
 - 以腾讯云官方 API 文档为准，不将具体业务流程塞进 SDK。
+- 代码设计与实现始终以 Rust 语言规范和惯用法为准；Java SDK 仅作协议、字段和功能参考，不照搬其类层次、反射、getter/setter 或同步调用结构。
 
 ## 测试与真实接口
 
@@ -28,4 +33,5 @@
 - 优先复用现有实现，尽量少引入第三方依赖。
 - 不夹带无关重构，不擅自提交或推送 Git 改动。
 - 完成后说明改动内容、实际运行的测试以及尚未验证的部分。
+- Workspace production-code line coverage must be at least 90% with all features enabled. Run `bash scripts/check-coverage.sh`; exclude only tests and benchmarks, never production modules. Keep unit tests in separate files under `src/tests/` so test bodies cannot inflate coverage. Report function/region coverage separately; line coverage is not branch coverage.
 - 不将本地测试通过表述为真实接口验证通过。
