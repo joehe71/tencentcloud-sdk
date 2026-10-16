@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/joehe71/tencentcloud-sdk/compare/v0.1.0...v0.1.1) (2026-10-16)
+
+
+### Bug Fixes
+
+* unblock crates.io publishing with a unique core package name ([#17](https://github.com/joehe71/tencentcloud-sdk/issues/17)) ([c7a6149](https://github.com/joehe71/tencentcloud-sdk/commit/c7a614936d54c532be39217029a115e135e888a9))
+
 ## 0.1.0 (2026-10-16)
 
 

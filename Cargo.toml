@@ -1,6 +1,6 @@
 [package]
 name = "tencentcloud-sdk"
-version = "0.1.0"
+version = "0.1.1"
 edition.workspace = true
 rust-version.workspace = true
 publish = ["crates-io"]
@@ -56,22 +56,22 @@ ses = ["dep:tencentcloud-sdk-ses"]
 ssm = ["dep:tencentcloud-sdk-ssm"]
 
 [dependencies]
-tencentcloud-sdk-foundation = { version = "0.1.0", path = "crates/core", default-features = false }
+tencentcloud-sdk-foundation = { version = "0.1.1", path = "crates/core", default-features = false }
 
 [dependencies.tencentcloud-sdk-cos]
-version = "0.1.0"
+version = "0.1.1"
 path = "crates/cos"
 optional = true
 default-features = false
 
 [dependencies.tencentcloud-sdk-ses]
-version = "0.1.0"
+version = "0.1.1"
 path = "crates/ses"
 optional = true
 default-features = false
 
 [dependencies.tencentcloud-sdk-ssm]
-version = "0.1.0"
+version = "0.1.1"
 path = "crates/ssm"
 optional = true
 default-features = false
