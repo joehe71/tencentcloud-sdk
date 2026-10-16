@@ -13,3 +13,6 @@ pub use tencentcloud_sdk_cos as cos;
 
 #[cfg(feature = "ses")]
 pub use tencentcloud_sdk_ses as ses;
+
+#[cfg(feature = "ssm")]
+pub use tencentcloud_sdk_ssm as ssm;
