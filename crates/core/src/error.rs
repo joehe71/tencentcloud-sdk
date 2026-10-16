@@ -105,3 +105,7 @@ impl Error for SdkError {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "tests/error.rs"]
+mod tests;

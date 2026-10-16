@@ -75,7 +75,10 @@ cargo test --workspace --all-features
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo doc --workspace --all-features --no-deps
 cargo tree -e normal --no-default-features
+bash scripts/check-coverage.sh
 ```
+
+全 feature 生产代码行覆盖率要求 **≥90%**，当前实测 **92.25%**；口径、工具配置和报告命令见 [Test coverage](docs/coverage.md)。
 
 测试使用固定假凭证与 MockTransport；HTTP 适配器测试只访问 127.0.0.1 临时端口，不依赖真实腾讯云凭证。签名预期值通过独立 Python hashlib/hmac 实现核对。
 

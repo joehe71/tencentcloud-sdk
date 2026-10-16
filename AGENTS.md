@@ -33,4 +33,5 @@
 - 优先复用现有实现，尽量少引入第三方依赖。
 - 不夹带无关重构，不擅自提交或推送 Git 改动。
 - 完成后说明改动内容、实际运行的测试以及尚未验证的部分。
+- Workspace production-code line coverage must be at least 90% with all features enabled. Run `bash scripts/check-coverage.sh`; exclude only tests and benchmarks, never production modules. Keep unit tests in separate files under `src/tests/` so test bodies cannot inflate coverage. Report function/region coverage separately; line coverage is not branch coverage.
 - 不将本地测试通过表述为真实接口验证通过。
