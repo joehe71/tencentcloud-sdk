@@ -7,7 +7,7 @@ Typed asynchronous API 3.0 calls for SSM **2019-09-23**. Enable the facade's opt
 The product wraps a preconfigured core client and adds only serde. It does not depend on COS or SES. Enable `transport-reqwest` in the facade for the core HTTP pool, or inject a transport. File/role credentials are separate opt-in features; the existing TKE OIDC, CVM and `AssumeRole` providers work without SSM-specific credential logic. The SDK never retrieves or installs a stored secret as the caller's cloud identity automatically.
 
 ```rust,no_run
-use tencentcloud_sdk_core::{Client as CoreClient, SdkError};
+use tencentcloud_sdk_foundation::{Client as CoreClient, SdkError};
 use tencentcloud_sdk_ssm::v20190923::{Client, models::GetSecretValueRequest};
 
 async fn read_secret(core: CoreClient) -> Result<(), SdkError> {

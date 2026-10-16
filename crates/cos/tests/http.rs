@@ -2,8 +2,8 @@
 #![cfg(feature = "transport-reqwest")]
 use bytes::Bytes;
 use std::time::Duration;
-use tencentcloud_sdk_core::{Credentials, Endpoint};
 use tencentcloud_sdk_cos::Client;
+use tencentcloud_sdk_foundation::{Credentials, Endpoint};
 use tokio::{
     io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
     net::TcpListener,

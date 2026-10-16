@@ -12,10 +12,10 @@ description = "Bounded asynchronous Tencent Cloud COS XML API client"
 
 [features]
 default = []
-transport-reqwest = ["tencentcloud-sdk-core/transport-reqwest"]
+transport-reqwest = ["tencentcloud-sdk-foundation/transport-reqwest"]
 
 [dependencies]
-tencentcloud-sdk-core = { path = "../core", version = "0.1.0", default-features = false, features = ["cos-signing"] }
+tencentcloud-sdk-foundation = { path = "../core", version = "0.1.0", default-features = false, features = ["cos-signing"] }
 bytes.workspace = true
 http.workspace = true
 futures-util.workspace = true

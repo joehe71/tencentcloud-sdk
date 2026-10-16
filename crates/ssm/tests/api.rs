@@ -10,7 +10,7 @@ use std::{
     },
     time::Duration,
 };
-use tencentcloud_sdk_core::{
+use tencentcloud_sdk_foundation::{
     BoxFuture, Client as CoreClient, Credentials, RequestOptions, SdkError,
     runtime::Clock,
     transport::{Transport, TransportRequest, TransportResponse},

@@ -8,7 +8,7 @@ use http::{HeaderMap, HeaderValue, Method, StatusCode};
 use md5::{Digest, Md5};
 use serde::de::DeserializeOwned;
 use std::{fmt, sync::Arc, time::Duration};
-use tencentcloud_sdk_core::{
+use tencentcloud_sdk_foundation::{
     Credentials, Endpoint, SdkError, cos_signing,
     credentials::{ProvideCredentials, StaticCredentialsProvider},
     runtime::{Clock, SystemClock},
@@ -330,7 +330,7 @@ fn default_transport() -> Result<Arc<dyn Transport>, Error> {
     #[cfg(feature = "transport-reqwest")]
     {
         Ok(Arc::new(
-            tencentcloud_sdk_core::transport::ReqwestTransport::new(Duration::from_secs(10))?,
+            tencentcloud_sdk_foundation::transport::ReqwestTransport::new(Duration::from_secs(10))?,
         ))
     }
     #[cfg(not(feature = "transport-reqwest"))]

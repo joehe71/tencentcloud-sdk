@@ -1,7 +1,7 @@
 //! Secrets Manager 2019-09-23: typed calls with no implicit mutation, retries or pagination.
 use serde::{Serialize, de::DeserializeOwned};
 use std::fmt;
-use tencentcloud_sdk_core::{
+use tencentcloud_sdk_foundation::{
     ApiResponse, Client as CoreClient, Operation, RequestOptions, SdkError,
 };
 

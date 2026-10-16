@@ -2,11 +2,11 @@
 //!
 //! Re-exports core types; `transport-reqwest` enables the default transport with a shared connection pool.
 
-pub use tencentcloud_sdk_core::{
+pub use tencentcloud_sdk_foundation::{
     ApiResponse, BoxFuture, Client, ClientBuilder, CommonClient, Credentials, Endpoint, Language,
     Operation, RequestOptions, ResponseMetadata, SdkError, ServiceError,
 };
-pub use tencentcloud_sdk_core::{credentials, runtime, transport};
+pub use tencentcloud_sdk_foundation::{credentials, runtime, transport};
 
 #[cfg(feature = "cos")]
 pub use tencentcloud_sdk_cos as cos;

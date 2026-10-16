@@ -38,7 +38,7 @@ The final step creates a lightweight `vX.Y.Z` tag at that exact commit using the
 
 The workflow then publishes these packages sequentially with `cargo publish --locked --registry crates-io`:
 
-1. `tencentcloud-sdk-core`
+1. `tencentcloud-sdk-foundation` (Rust library name `tencentcloud_sdk_foundation`)
 2. `tencentcloud-sdk-cos`
 3. `tencentcloud-sdk-ses`
 4. `tencentcloud-sdk-ssm`
@@ -48,9 +48,15 @@ Each uploaded archive must contain matching source-commit metadata, LICENSE, and
 
 ### Recovery
 
-Git tags, GitHub Releases, and registry uploads are not atomic: a tag can remain if Release creation fails, and both the tag and Release can remain if a later upload fails. Do not delete/move that tag, recreate a published Release, or overwrite a registry version. Manually dispatch **Publish crates** on `main` before merging another version PR. It finds the latest version-manifest commit even if unrelated code has subsequently landed on `main`. The workflow first verifies the existing tag and reuses its published GitHub Release, or creates the missing Release from the same version's notes. Existing registry versions are packaged again and skipped only when their checksums match the local archive exactly; a mismatch or yanked version fails closed. Crates.io versions cannot be overwritten. Cargo failures are not blindly retried; a maintainer initiates a new run after inspecting the cause.
+Git tags, GitHub Releases, and registry uploads are not atomic: a tag can remain if Release creation fails, and both the tag and Release can remain if a later upload fails. Do not delete/move that tag, recreate a published Release, or overwrite a registry version. Manually dispatch **Publish crates** on `main` before merging another version PR. It finds the latest version-manifest commit even if unrelated code has subsequently landed on `main`. The workflow first verifies the existing tag and reuses its published GitHub Release, or creates the missing Release from the same version's notes. Existing registry versions are packaged again with stable Cargo 1.85-compatible `cargo package --locked --package NAME` and skipped only when their checksums match the local archive exactly; a mismatch or yanked version fails closed. The package command deliberately omits `--registry`, which requires nightly in Cargo 1.85. Registry selection remains explicit for `cargo publish`, all manifests restrict publication to `crates-io`, and checksum lookups use the crates.io index. Crates.io versions cannot be overwritten. Cargo failures are not blindly retried; a maintainer initiates a new run after inspecting the cause.
 
 Manual dispatch always targets the latest manifest version, not an arbitrary old release. If a newer version PR is merged before a previous partial publication is recovered, recovering the older version requires a separately reviewed process. Do not mark such an incomplete release as successfully published.
+
+### Initial 0.1.0 package-name collision
+
+The source tag and GitHub Release `v0.1.0` exist, but that snapshot refers to the unrelated, already-published `tencentcloud-sdk-core` package. Its registry checksum does not match this repository. Do not overwrite or reuse that registry version, move the tag, or treat the GitHub Release as successful crates.io publication.
+
+The replacement package is `tencentcloud-sdk-foundation`, with the matching Cargo-derived Rust library name `tencentcloud_sdk_foundation`. Core imports must use the new name; no old-name alias is retained. The other four package names are unchanged. After merging the name/packaging fix, merge the next generated version PR to publish a new validated snapshot. Do not rerun the original failed job expecting it to use new scripts or names: publication intentionally checks out the exact version-PR commit, so `v0.1.0` remains the old snapshot. Package-name availability is checked before implementation but is not a reservation; crates.io enforces availability and ownership at upload time. Ensure `CARGO_REGISTRY_TOKEN` permits creating/publishing `tencentcloud-sdk-foundation`; a token restricted to the old core name is insufficient.
 
 ## Local automation checks
 

@@ -70,7 +70,7 @@ CARGO_PROFILE_RELEASE_OPT_LEVEL=3 \
 CARGO_PROFILE_RELEASE_LTO=false \
 CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16 \
 CARGO_PROFILE_RELEASE_DEBUG=0 \
-cargo test -p tencentcloud-sdk-core --release --no-default-features --locked \
+cargo test -p tencentcloud-sdk-foundation --release --no-default-features --locked \
   --lib benchmarks::core_performance_baseline \
   -- --ignored --exact --nocapture --test-threads=1
 ```

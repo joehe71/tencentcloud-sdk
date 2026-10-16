@@ -17,7 +17,7 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ".release-please-manifest.json"
 PACKAGES = [
-    ("tencentcloud-sdk-core", "crates/core"),
+    ("tencentcloud-sdk-foundation", "crates/core"),
     ("tencentcloud-sdk-cos", "crates/cos"),
     ("tencentcloud-sdk-ses", "crates/ses"),
     ("tencentcloud-sdk-ssm", "crates/ssm"),
@@ -237,7 +237,7 @@ def publish(version, sha):
     for name, _ in PACKAGES:
         existing = registry_entry(name, version)
         if existing is not None:
-            command(["cargo", "package", "--locked", "--registry", "crates-io", "--package", name])
+            command(["cargo", "package", "--locked", "--package", name])
             require(archive_checksum(name, version, sha) == existing["cksum"], f"Existing registry version differs from this source: {name}")
             print(f"Already published, checksum verified: {name} {version}")
             continue

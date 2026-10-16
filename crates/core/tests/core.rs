@@ -17,7 +17,7 @@ use futures_core::Stream;
 use http::{HeaderMap, HeaderName, HeaderValue, Method, StatusCode};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use tencentcloud_sdk_core::{
+use tencentcloud_sdk_foundation::{
     ApiResponse, BoxFuture, Client, ClientBuilder, CommonClient, Credentials, Endpoint, Language,
     Operation, RequestOptions, SdkError,
     credentials::ProvideCredentials,

@@ -58,7 +58,7 @@ impl Client {
         );
         let response = self.call(request).await?;
         if response.status != http::StatusCode::PARTIAL_CONTENT {
-            return Err(tencentcloud_sdk_core::SdkError::Protocol {
+            return Err(tencentcloud_sdk_foundation::SdkError::Protocol {
                 message: "COS did not honor the byte range",
                 status: response.status,
                 request_id: response.request_id,

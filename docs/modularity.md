@@ -56,9 +56,9 @@ tencentcloud-sdk/
 ```text
 应用
  └─ tencentcloud-sdk [cvm, transport-reqwest]
-     ├─ tencentcloud-sdk-core
+     ├─ tencentcloud-sdk-foundation
      └─ tencentcloud-sdk-cvm
-         └─ tencentcloud-sdk-core
+         └─ tencentcloud-sdk-foundation
 
 没有开启 cynosdb → 不构建 tencentcloud-sdk-cynosdb
 ```
@@ -88,13 +88,13 @@ exclude = ["tests/live"]
 default = []
 cvm = ["dep:tencentcloud-sdk-cvm", "tencentcloud-sdk-cvm/v20170312"]
 cynosdb = ["dep:tencentcloud-sdk-cynosdb", "tencentcloud-sdk-cynosdb/v20190107"]
-transport-reqwest = ["tencentcloud-sdk-core/transport-reqwest"]
-sse = ["tencentcloud-sdk-core/sse"]
-tracing = ["tencentcloud-sdk-core/tracing"]
-legacy-signing = ["tencentcloud-sdk-core/legacy-signing"]
+transport-reqwest = ["tencentcloud-sdk-foundation/transport-reqwest"]
+sse = ["tencentcloud-sdk-foundation/sse"]
+tracing = ["tencentcloud-sdk-foundation/tracing"]
+legacy-signing = ["tencentcloud-sdk-foundation/legacy-signing"]
 
 [dependencies]
-tencentcloud-sdk-core = { version = "0.1.0", path = "crates/core", default-features = false }
+tencentcloud-sdk-foundation = { version = "0.1.0", path = "crates/core", default-features = false }
 tencentcloud-sdk-cvm = { version = "0.1.0", path = "crates/cvm", optional = true, default-features = false }
 tencentcloud-sdk-cynosdb = { version = "0.1.0", path = "crates/cynosdb", optional = true, default-features = false }
 ```
@@ -106,12 +106,12 @@ facade 的 src/lib.rs：
 ```rust
 #![forbid(unsafe_code)]
 
-pub use tencentcloud_sdk_core::{
+pub use tencentcloud_sdk_foundation::{
     ApiResponse, Client, ClientBuilder, Credentials, RequestOptions, SdkError,
 };
 
-pub use tencentcloud_sdk_core::credentials;
-pub use tencentcloud_sdk_core::transport;
+pub use tencentcloud_sdk_foundation::credentials;
+pub use tencentcloud_sdk_foundation::transport;
 
 #[cfg(feature = "cvm")]
 pub use tencentcloud_sdk_cvm as cvm;

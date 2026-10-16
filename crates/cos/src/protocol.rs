@@ -4,7 +4,7 @@ use futures_util::StreamExt;
 use http::HeaderMap;
 use quick_xml::{Reader, events::Event};
 use serde::{Deserialize, de::DeserializeOwned};
-use tencentcloud_sdk_core::{SdkError, transport::TransportResponse};
+use tencentcloud_sdk_foundation::{SdkError, transport::TransportResponse};
 
 pub(crate) async fn collect(
     mut response: TransportResponse,

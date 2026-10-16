@@ -172,9 +172,9 @@ impl OidcRoleCredentialsProvider {
     ///
     /// ```no_run
     /// # #[cfg(feature = "transport-reqwest")]
-    /// # fn build_client() -> Result<tencentcloud_sdk_core::Client, tencentcloud_sdk_core::SdkError> {
+    /// # fn build_client() -> Result<tencentcloud_sdk_foundation::Client, tencentcloud_sdk_foundation::SdkError> {
     /// use std::{sync::Arc, time::Duration};
-    /// use tencentcloud_sdk_core::{Client, credentials::{OidcRoleCredentialsProvider, RoleProviderOptions},
+    /// use tencentcloud_sdk_foundation::{Client, credentials::{OidcRoleCredentialsProvider, RoleProviderOptions},
     ///     transport::ReqwestTransport};
     /// let transport = Arc::new(ReqwestTransport::new(Duration::from_secs(10))?);
     /// let provider = OidcRoleCredentialsProvider::from_tke_env(
