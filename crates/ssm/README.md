@@ -52,17 +52,16 @@ The sealed `Request` trait pairs every input with the original action and correc
 - Writes, version deletion, credential deletion, key creation and product rotation are sent **once**. The SDK never adds a deletion mode or recovery window, forces deletion, deletes a related SSH key, rotates a credential after a read, replays a failed mutation, follows up with a second business call or polls automatically. Server defaults still apply when fields are omitted; applications must choose explicit deletion parameters carefully.
 - List/history methods return a single page. Pass the appropriate Offset/Limit and inspect totals explicitly. Service status and asynchronous task responses are returned as-is, not interpreted as readiness guarantees.
 
-## Offline verification and generation
+## Offline verification and protocol reference
 
 Tests cover all 24 typed action routes and every field of all 54 models, including null handling and Debug redaction. Hand-written scenarios verify exact text/binary creation, tags and version selectors, secret reads without cache, Base64 SSH keys and large project IDs, explicit deletion parameters, original errors without replay, pagination overrides, bounded bodies, zero timeout and malformed typed responses. All inputs are fake and transports are local mocks; no secret, key or cloud resource is created, retrieved, deleted or rotated in a real account.
 
-Protocol metadata references Tencent Cloud Java SDK 3.2.40, `ssm/v20190923`. The checked-in schema records the snapshot, not a claim to implement newer actions. Cargo does not invoke code generation or need the Java checkout. Explicit regeneration:
+Protocol metadata references Tencent Cloud Java SDK 3.2.40, `ssm/v20190923`. The checked-in schema records the snapshot, not a claim to implement newer actions. Cargo does not invoke code generation or need the Java checkout. Maintain the Rust models, typed bindings, schema snapshot, and fixtures together when updating the supported protocol.
 
 ```bash
-python3 scripts/generate-product.py ../tencentcloud-sdk-java ssm v20190923
 cargo fmt --all
 cargo test -p tencentcloud-sdk-ssm
 bash scripts/check-coverage.sh
 ```
 
-The generator uses Python's standard library and consumes only annotated wire metadata, not Java behavior or comments. Generated fixtures supplement independent hand-written fixtures. Upstream attribution and Apache-2.0 terms are in `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt`. See [official SSM documentation](https://cloud.tencent.com/document/product/1140).
+The reference contributes annotated wire metadata, not Java behavior or comments. Model fixtures supplement independent hand-written fixtures. Upstream attribution and Apache-2.0 terms are in `THIRD_PARTY_NOTICES.md` and `LICENSE`. See [official SSM documentation](https://cloud.tencent.com/document/product/1140).

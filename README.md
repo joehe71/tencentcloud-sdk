@@ -1,27 +1,27 @@
-# 腾讯云 Rust SDK
+# Tencent Cloud Rust SDK
 
-按 Rust 惯用法设计的腾讯云 API 3.0 SDK：对外一个入口 crate，对内将共享内核与产品封装分离。Java SDK 只用于协议和模型参考，不移植其类层次或反射调用。
+An idiomatic Rust SDK for Tencent Cloud API 3.0, with one facade crate and separate shared-core and product crates. The Java SDK is a protocol and model reference only; its class hierarchy and reflection-based calls are not ported.
 
-当前包含共享内核 `tencentcloud-sdk-core` 与按需启用的 COS、SES、SSM 产品 crate；各包均暂不发布。架构文档描述的其他产品、自动分页、SSE 等能力不代表已经实现。
+The workspace includes `tencentcloud-sdk-core` and opt-in COS, SES, and SSM crates. Other products, automatic pagination, SSE, and other capabilities described in the architecture documents are not necessarily implemented.
 
-## 已实现
+## Implemented features
 
-- Rust 2024 workspace，根入口重导出 core，默认 feature 为空。
-- 共享、不可变配置的异步 Client；需要启用时间驱动的 Tokio Runtime，SDK 不创建 Runtime。
-- 静态凭证与显式环境凭证加载；支持临时 Token、自定义异步凭证提供器。
-- 可选凭证文件、CVM 实例角色、STS AssumeRole、TKE/OIDC、显式默认凭证链，以及共享缓存和按需自动刷新。
-- TC3-HMAC-SHA256、POST JSON、固定操作描述和动态通用调用。
-- `cos` feature：独立 COS XML REST 客户端，支持常用对象/桶操作、分块上传和预签名 URL，见 [COS guide](crates/cos/README.md)。
-- `ses` feature：SES 2020-10-02 的 36 个强类型 API，复用 core，见 [SES guide](crates/ses/README.md)。
-- `ssm` feature：SSM 2019-09-23 的 24 个强类型 API，复用 core，见 [SSM guide](crates/ssm/README.md)。
-- 可替换 Transport；可选 reqwest/Rustls 连接池实现。
-- 按产品的 HTTPS 根端点覆盖、单次 Region/语言/Header/超时选项。
-- JSON 统一响应外层、强类型解析、保留官方错误码与 RequestId。
-- 有界请求编码与实际响应字节读取，凭证和请求的默认调试输出脱敏。
+- Rust 2024 workspace; the facade re-exports core and has no default features.
+- Shared asynchronous Client with immutable configuration; requires a Tokio runtime with time enabled. The SDK does not create a runtime.
+- Static credentials, explicit environment credential loading, temporary tokens, and custom asynchronous credential providers.
+- Optional credential files, CVM instance roles, STS AssumeRole, TKE/OIDC, an explicitly selected default credential chain, shared caching, and on-demand refresh.
+- TC3-HMAC-SHA256, POST JSON, fixed operation descriptors, and dynamic generic calls.
+- `cos`: a separate COS XML REST client with common object/bucket operations, multipart uploads, and presigned URLs. See the [COS guide](crates/cos/README.md).
+- `ses`: 36 typed SES 2020-10-02 APIs using core. See the [SES guide](crates/ses/README.md).
+- `ssm`: 24 typed SSM 2019-09-23 APIs using core. See the [SSM guide](crates/ssm/README.md).
+- Replaceable Transport, with an optional pooled reqwest/Rustls implementation.
+- Per-product HTTPS root endpoint overrides and per-call region, language, header, and timeout options.
+- Common JSON response envelopes, typed decoding, and preserved official error codes and RequestId.
+- Bounded request encoding and actual response-byte reads; default credential and request debug output is redacted.
 
-## 依赖与使用
+## Dependencies and usage
 
-仓库尚未发布，使用本地路径依赖：
+Use a local path dependency when working from source:
 
 ```toml
 [dependencies]
@@ -30,7 +30,7 @@ serde_json = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 ```
 
-以下示例会发起真实查询，需由应用自行授权运行；本仓库默认测试不会执行它：
+The following example makes a real query and requires explicit application authorization. The repository's default tests do not execute it:
 
 ```rust,no_run
 use tencentcloud_sdk::{ApiResponse, Client, CommonClient};
@@ -51,25 +51,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-`credentials_from_env()` 仅在 build 时读取 `TENCENTCLOUD_SECRET_ID`、`TENCENTCLOUD_SECRET_KEY` 和可选的 `TENCENTCLOUD_TOKEN`，不探测实例元数据、不调用 STS，也不在每次请求重新读取环境。该静态环境快照没有自动有效期管理；需要角色换证和刷新时，可显式启用 `credentials-roles` 并选择相应提供器，见 [Credentials guide](docs/credentials.md)。
+`credentials_from_env()` reads `TENCENTCLOUD_SECRET_ID`, `TENCENTCLOUD_SECRET_KEY`, and optional `TENCENTCLOUD_TOKEN` only when building the client. It does not probe instance metadata, call STS, or reread the environment for each request. This static snapshot has no automatic expiration management. For role credentials and refresh, explicitly enable `credentials-roles` and select a provider. See the [credentials guide](docs/credentials.md).
 
-也可以使用 `Operation::new(service, version, action)` 搭配 `Client::execute` 和自定义 serde 请求/响应结构。该入口与 CommonClient 使用同一调用链路，所有请求必须编码为 JSON 对象。
+You can also use `Operation::new(service, version, action)` with `Client::execute` and custom serde request/response types. This uses the same call pipeline as CommonClient; every request must encode as a JSON object.
 
-未启用 `transport-reqwest` 时需通过构造器注入 `Transport`，否则 build 返回配置错误。core 不隐藏开启网络依赖。
+Without `transport-reqwest`, inject a `Transport` through the builder; otherwise building returns a configuration error. Core does not implicitly enable network dependencies.
 
-## 默认行为与限制
+## Defaults and limitations
 
-- 每次调用只发送一次请求，不自动重试；默认传输关闭重定向和环境代理，开启 TLS 证书校验。
-- 自定义 Transport 必须遵守禁止重定向、自动重放和请求重编码的约束。
-- 默认连接超时 10 秒，调用预算 60 秒，请求和响应体各限制 32 MiB。
-- 预算包含凭证获取与响应体读取；同步编码/解码无法被中途抢占，会在阶段边界检查是否超时。
-- endpoint 只支持 HTTPS 根 URL，不支持任意路径/查询串；HTTP 仅通过显式数值回环端点供本地测试使用。
-- HTTP 非 200 也解析腾讯云 JSON 错误；缺失 Content-Type 时尝试 JSON，存在时必须为 application/json，可带 charset。
-- 服务错误 message 可能含业务信息，仅通过字段显式访问，不进入默认 Display/Debug；调用方显式访问错误来源时仍需注意其中的敏感信息。
-- 默认不读取凭证文件或探测元数据；文件和角色凭证必须显式启用并选择，SDK 不持久化密钥。
-- API 3.0 调用仍仅支持 POST JSON；COS 使用独立 XML REST/二进制协议与 HMAC-SHA1 签名。当前不支持通用旧版签名、HTTP multipart/form-data、SSE、自动分页、并发限额和容灾切换。
+- Each call sends one request with no automatic retry. The default transport disables redirects and environment proxies and verifies TLS certificates.
+- Custom transports must not redirect, automatically replay, or re-encode requests.
+- Defaults: 10-second connection timeout, 60-second call budget, and 32 MiB limits for both request and response bodies.
+- The budget includes credential acquisition and response-body reads. Synchronous encoding/decoding cannot be preempted; deadlines are checked at stage boundaries.
+- Endpoints must be HTTPS root URLs, without arbitrary paths or query strings. HTTP is allowed only for explicitly selected numeric loopback endpoints in local tests.
+- Tencent Cloud JSON errors are parsed even for non-200 HTTP responses. Missing Content-Type permits a JSON attempt; when present, it must be application/json, optionally with a charset.
+- Service error messages may contain business data. They are available through explicit field access and omitted from default Display/Debug. Explicit access to error sources may still disclose sensitive information.
+- Credential files and metadata are not probed by default. File and role credentials must be explicitly enabled and selected; the SDK does not persist secrets.
+- API 3.0 calls support POST JSON only. COS uses a separate XML REST/binary protocol with HMAC-SHA1. Generic legacy signing, HTTP multipart/form-data, SSE, automatic pagination, concurrency limits, and disaster-recovery failover are not implemented.
 
-## 本地校验
+## Local checks
 
 ```bash
 cargo fmt --all --check
@@ -81,19 +81,19 @@ cargo tree -e normal --no-default-features
 bash scripts/check-coverage.sh
 ```
 
-全 feature 生产代码行覆盖率要求 **≥90%**，当前实测 **95.72%**；口径、工具配置和报告命令见 [Test coverage](docs/coverage.md)。
+Production-code line coverage with all features must be **at least 90%**; the current measured result is **95.72%**. See [test coverage](docs/coverage.md) for scope, tooling, and reporting commands.
 
-测试使用固定假凭证与 MockTransport；HTTP 适配器测试只访问 127.0.0.1 临时端口，不依赖真实腾讯云凭证。签名预期值通过独立 Python hashlib/hmac 实现核对。
+Tests use fixed fake credentials and MockTransport. HTTP adapter tests use only ephemeral 127.0.0.1 ports and do not require real Tencent Cloud credentials. Expected signatures are checked against independent Python hashlib/hmac calculations.
 
-最低 Rust 版本 **1.85.0** 已在 macOS ARM 上验证。离线性能基准使用 release 配置，显式运行，不进入默认测试或 SDK 运行时依赖；环境、结果和复现命令见 [实测报告](docs/validation.md)。
+The minimum supported Rust version, **1.85.0**, has been verified on macOS ARM. Offline performance benchmarks use the release profile and run explicitly, outside default tests and SDK runtime dependencies. See the [validation report](docs/validation.md) for the environment, results, and reproduction commands.
 
 ## Releases
 
 Release Please creates or updates PRs for the shared workspace version and [changelog](CHANGELOG.md) on pushes to `main`. A separate publishing workflow tags the merged version PR commit as `vX.Y.Z` and publishes all five crates to crates.io in dependency order. Neither workflow creates GitHub Releases. The SDK is licensed under [Apache-2.0](LICENSE). See the [release guide](docs/releases.md) for credentials, safety checks, and recovery.
 
-## 设计文档
+## Design documents
 
 - [Credentials guide](docs/credentials.md)
-- [整体架构](docs/architecture.md)
-- [模块化与按需依赖](docs/modularity.md)
-- [性能与离线基准](docs/performance.md)
+- [Architecture](docs/architecture.md)
+- [Modularity and opt-in dependencies](docs/modularity.md)
+- [Performance and offline benchmarks](docs/performance.md)

@@ -56,17 +56,16 @@ All **36 actions in the referenced Java snapshot** have typed methods and reques
 - Calls use the shared core TC3 signature, token handling, deadlines and body bounds. Service errors are returned unchanged, preserving official code, message and `RequestId`; default formatting omits the message. Side effects are sent **once**, including email delivery and receiver/template changes.
 - List operations return exactly one page. Manage Limit/Offset, totals and subsequent calls explicitly. There are no automatic sends, retries, pagination, task polling, delivery guarantees or unsubscribe business workflows.
 
-## Offline verification and generation
+## Offline verification and protocol reference
 
 Tests invoke all 36 typed methods and verify exact actions, service/version/token headers, signing scope and response types. Every model is round-tripped with all fields populated and with JSON null, and its Debug redaction is checked. Independent hand-written fixtures verify nested templates, attachments, recipient lists, large integers, pagination options, SMTP passwords, malformed typed responses and unchanged service errors without replay. No message is sent to a real account.
 
-Checked-in files compile without Java, Python, network access or generation at build time. Protocol metadata comes from the local Tencent Cloud Java SDK 3.2.40 snapshot, `ses/v20201002`. To regenerate explicitly from a trusted local checkout:
+Checked-in files compile without Java, Python, network access, or generation at build time. Protocol metadata references Tencent Cloud Java SDK 3.2.40, `ses/v20201002`. Maintain the Rust models, typed bindings, schema snapshot, and fixtures together when updating the supported protocol.
 
 ```bash
-python3 scripts/generate-product.py ../tencentcloud-sdk-java ses v20201002
 cargo fmt --all
 cargo test -p tencentcloud-sdk-ses
 bash scripts/check-coverage.sh
 ```
 
-Generation consumes only annotated field names/types and action identifiers, not Java inheritance, behavior or comments. The checked-in schema records the precise wire snapshot; all generated fixtures supplement, rather than replace, independent hand-written tests. Attribution and the upstream Apache-2.0 license are retained in `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt`. See [official SES API documentation](https://cloud.tencent.com/document/product/1288/51034).
+The reference contributes annotated field names/types and action identifiers, not Java inheritance, behavior, or comments. The checked-in schema records the precise wire snapshot; model fixtures supplement, rather than replace, independent hand-written tests. Attribution and the upstream Apache-2.0 license are retained in `THIRD_PARTY_NOTICES.md` and `LICENSE`. See [official SES API documentation](https://cloud.tencent.com/document/product/1288/51034).
