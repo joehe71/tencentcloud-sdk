@@ -1,6 +1,12 @@
 use super::*;
 
 #[test]
+fn hex_preserves_leading_zeroes_and_uses_lowercase() {
+    assert_eq!(hex(&[]), "");
+    assert_eq!(hex(&[0x00, 0x01, 0x0f, 0x10, 0xab, 0xff]), "00010f10abff");
+}
+
+#[test]
 fn fixed_vector_matches_independent_python_implementation() {
     // Compute the expected value independently with Python hashlib/hmac and fake credentials using the official TC3 steps.
     let credentials = Credentials::new("test-id", "test-key").unwrap();

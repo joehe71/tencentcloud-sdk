@@ -1,4 +1,4 @@
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use http::HeaderValue;
 use sha2::{Digest, Sha256};
 use time::OffsetDateTime;
@@ -61,7 +61,7 @@ fn sha256_hex(data: &[u8]) -> String {
     hex(&Sha256::digest(data))
 }
 
-fn hex(bytes: &[u8]) -> String {
+pub(crate) fn hex(bytes: &[u8]) -> String {
     const DIGITS: &[u8; 16] = b"0123456789abcdef";
     let mut output = String::with_capacity(bytes.len() * 2);
     for byte in bytes {
