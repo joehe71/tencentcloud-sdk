@@ -33,7 +33,7 @@ time.workspace = true
 tokio.workspace = true
 
 [dev-dependencies]
-criterion = { version = "0.5.1", default-features = false }
+criterion = { version = "0.7.0", default-features = false }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "test-util", "net", "io-util", "sync"] }
 
 [lints]
