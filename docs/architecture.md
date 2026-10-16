@@ -173,7 +173,7 @@ codegen ──读取元数据──→ 生成产品 crate
 以下是公开接口形态示例，不是已经实现的代码：
 
 ```rust
-use tencentcloud_sdk_core::Client;
+use tencentcloud_sdk_foundation::Client;
 use tencentcloud_sdk_cvm::v20170312::{Client as CvmClient, models::DescribeInstancesRequest};
 
 let core = Client::builder()

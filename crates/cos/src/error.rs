@@ -1,6 +1,6 @@
 use http::StatusCode;
 use std::{error::Error as StdError, fmt};
-use tencentcloud_sdk_core::SdkError;
+use tencentcloud_sdk_foundation::SdkError;
 
 /// A COS service error preserving official fields while redacting the message from formatting.
 #[derive(Clone)]

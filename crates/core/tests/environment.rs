@@ -1,6 +1,6 @@
 //! Exercise process-environment entry points in isolated children, never the caller's environment.
 use std::{process::Command, sync::Arc};
-use tencentcloud_sdk_core::{
+use tencentcloud_sdk_foundation::{
     BoxFuture, Client, SdkError,
     credentials::{EnvironmentCredentialsProvider, ProvideCredentials},
     transport::{Transport, TransportRequest, TransportResponse},
@@ -67,7 +67,7 @@ async fn environment_child() {
     }
     #[cfg(feature = "credentials-roles")]
     {
-        use tencentcloud_sdk_core::credentials::{
+        use tencentcloud_sdk_foundation::credentials::{
             DefaultCredentialsProvider, OidcRoleCredentialsProvider, RoleProviderOptions,
         };
         let options = RoleProviderOptions::new(Arc::new(NoNetwork));

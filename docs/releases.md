@@ -38,7 +38,7 @@ The final step creates a lightweight `vX.Y.Z` tag at that exact commit using the
 
 The workflow then publishes these packages sequentially with `cargo publish --locked --registry crates-io`:
 
-1. `tencentcloud-sdk-foundation` (Rust library name `tencentcloud_sdk_core`)
+1. `tencentcloud-sdk-foundation` (Rust library name `tencentcloud_sdk_foundation`)
 2. `tencentcloud-sdk-cos`
 3. `tencentcloud-sdk-ses`
 4. `tencentcloud-sdk-ssm`
@@ -56,7 +56,7 @@ Manual dispatch always targets the latest manifest version, not an arbitrary old
 
 The source tag and GitHub Release `v0.1.0` exist, but that snapshot refers to the unrelated, already-published `tencentcloud-sdk-core` package. Its registry checksum does not match this repository. Do not overwrite or reuse that registry version, move the tag, or treat the GitHub Release as successful crates.io publication.
 
-The replacement package is `tencentcloud-sdk-foundation`; its `[lib]` name remains `tencentcloud_sdk_core`, preserving Rust imports. The other four package names are unchanged. After merging the name/packaging fix, merge the next generated version PR to publish a new validated snapshot. Do not rerun the original failed job expecting it to use new scripts or names: publication intentionally checks out the exact version-PR commit, so `v0.1.0` remains the old snapshot. Package-name availability is checked before implementation but is not a reservation; crates.io enforces availability and ownership at upload time. Ensure `CARGO_REGISTRY_TOKEN` permits creating/publishing `tencentcloud-sdk-foundation`; a token restricted to the old core name is insufficient.
+The replacement package is `tencentcloud-sdk-foundation`, with the matching Cargo-derived Rust library name `tencentcloud_sdk_foundation`. Core imports must use the new name; no old-name alias is retained. The other four package names are unchanged. After merging the name/packaging fix, merge the next generated version PR to publish a new validated snapshot. Do not rerun the original failed job expecting it to use new scripts or names: publication intentionally checks out the exact version-PR commit, so `v0.1.0` remains the old snapshot. Package-name availability is checked before implementation but is not a reservation; crates.io enforces availability and ownership at upload time. Ensure `CARGO_REGISTRY_TOKEN` permits creating/publishing `tencentcloud-sdk-foundation`; a token restricted to the old core name is insufficient.
 
 ## Local automation checks
 

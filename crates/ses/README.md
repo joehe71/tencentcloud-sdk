@@ -7,7 +7,7 @@ Typed asynchronous API 3.0 calls for SES **2020-10-02**, exposed as `tencentclou
 Enable `ses` plus `transport-reqwest` in the facade, or inject an application-owned core transport. The product adds no runtime dependencies beyond core and serde; it does not depend on COS. A product client is a cloneable view over an existing core client. Clones share credentials, refresh cache, endpoint configuration and the HTTP pool.
 
 ```rust,no_run
-use tencentcloud_sdk_core::{Client as CoreClient, SdkError};
+use tencentcloud_sdk_foundation::{Client as CoreClient, SdkError};
 use tencentcloud_sdk_ses::v20201002::{Client, models::{SendEmailRequest, Template}};
 
 async fn send(core: CoreClient) -> Result<(), SdkError> {

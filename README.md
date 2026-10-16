@@ -2,7 +2,7 @@
 
 An idiomatic Rust SDK for Tencent Cloud API 3.0, with one facade crate and separate shared-core and product crates. The Java SDK is a protocol and model reference only; its class hierarchy and reflection-based calls are not ported.
 
-The workspace includes the `tencentcloud-sdk-foundation` package (Rust library name `tencentcloud_sdk_core`) and opt-in COS, SES, and SSM crates. Other products, automatic pagination, SSE, and other capabilities described in the architecture documents are not necessarily implemented.
+The workspace includes the `tencentcloud-sdk-foundation` package (Rust library name `tencentcloud_sdk_foundation`) and opt-in COS, SES, and SSM crates. Other products, automatic pagination, SSE, and other capabilities described in the architecture documents are not necessarily implemented.
 
 ## Implemented features
 

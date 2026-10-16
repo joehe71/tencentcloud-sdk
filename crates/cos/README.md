@@ -6,7 +6,7 @@ An asynchronous COS **XML REST API** client, separate from API 3.0 JSON and TC3.
 
 ```rust,no_run
 use std::sync::Arc;
-use tencentcloud_sdk_core::{Credentials, Endpoint, credentials::StaticCredentialsProvider,
+use tencentcloud_sdk_foundation::{Credentials, Endpoint, credentials::StaticCredentialsProvider,
     transport::Transport};
 use tencentcloud_sdk_cos::{Client, Error};
 

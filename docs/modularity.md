@@ -106,12 +106,12 @@ facade 的 src/lib.rs：
 ```rust
 #![forbid(unsafe_code)]
 
-pub use tencentcloud_sdk_core::{
+pub use tencentcloud_sdk_foundation::{
     ApiResponse, Client, ClientBuilder, Credentials, RequestOptions, SdkError,
 };
 
-pub use tencentcloud_sdk_core::credentials;
-pub use tencentcloud_sdk_core::transport;
+pub use tencentcloud_sdk_foundation::credentials;
+pub use tencentcloud_sdk_foundation::transport;
 
 #[cfg(feature = "cvm")]
 pub use tencentcloud_sdk_cvm as cvm;

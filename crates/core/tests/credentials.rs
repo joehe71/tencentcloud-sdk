@@ -14,7 +14,7 @@ use std::{
 use bytes::Bytes;
 use http::{HeaderMap, Method, StatusCode};
 use serde_json::{Value, json};
-use tencentcloud_sdk_core::{
+use tencentcloud_sdk_foundation::{
     ApiResponse, BoxFuture, Client, Credentials, Endpoint, Operation, SdkError,
     credentials::{
         AssumeRoleConfig, AssumeRoleCredentialsProvider, CvmRoleCredentialsProvider,

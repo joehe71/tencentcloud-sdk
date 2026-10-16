@@ -1,7 +1,7 @@
 //! SES 2020-10-02: explicit, single-attempt calls with no implicit pagination.
 use serde::{Serialize, de::DeserializeOwned};
 use std::fmt;
-use tencentcloud_sdk_core::{
+use tencentcloud_sdk_foundation::{
     ApiResponse, Client as CoreClient, Operation, RequestOptions, SdkError,
 };
 

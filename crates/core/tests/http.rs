@@ -5,7 +5,9 @@
 use std::{io, time::Duration};
 
 use serde_json::{Value, json};
-use tencentcloud_sdk_core::{ApiResponse, Client, Credentials, Endpoint, Operation, SdkError};
+use tencentcloud_sdk_foundation::{
+    ApiResponse, Client, Credentials, Endpoint, Operation, SdkError,
+};
 use tokio::{
     io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
     net::{TcpListener, TcpStream},

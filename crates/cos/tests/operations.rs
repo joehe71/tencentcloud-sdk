@@ -10,15 +10,15 @@ use std::{
     },
     time::Duration,
 };
-use tencentcloud_sdk_core::{
+use tencentcloud_sdk_cos::{
+    Client, ClientBuilder, Error,
+    models::{CompletedPart, ListObjectsOptions},
+};
+use tencentcloud_sdk_foundation::{
     BoxFuture, Credentials, Endpoint, SdkError,
     credentials::ProvideCredentials,
     runtime::Clock,
     transport::{Transport, TransportRequest, TransportResponse},
-};
-use tencentcloud_sdk_cos::{
-    Client, ClientBuilder, Error,
-    models::{CompletedPart, ListObjectsOptions},
 };
 
 type Handler = dyn Fn(TransportRequest) -> BoxFuture<'static, Result<TransportResponse, SdkError>>
