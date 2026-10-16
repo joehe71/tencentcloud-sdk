@@ -1,5 +1,5 @@
-use crate::{Credentials, SdkError, transport::TransportRequest};
-use hmac::{Hmac, Mac};
+use crate::{Credentials, SdkError, signing::hex, transport::TransportRequest};
+use hmac::{Hmac, KeyInit, Mac};
 use http::{HeaderValue, Uri};
 use percent_encoding::{AsciiSet, NON_ALPHANUMERIC, percent_decode_str, utf8_percent_encode};
 use sha1::{Digest, Sha1};
@@ -170,8 +170,8 @@ fn signature(
     );
     let sign_key = hmac(credentials.secret_key().as_bytes(), key_time.as_bytes())?;
     let to_sign = format!(
-        "sha1\n{key_time}\n{:x}\n",
-        Sha1::digest(canonical.as_bytes())
+        "sha1\n{key_time}\n{}\n",
+        hex(&Sha1::digest(canonical.as_bytes()))
     );
     let digest = hmac(sign_key.as_bytes(), to_sign.as_bytes())?;
     let mut value = HeaderValue::from_str(&format!("q-sign-algorithm=sha1&q-ak={}&q-sign-time={key_time}&q-key-time={key_time}&q-header-list={}&q-url-param-list={}&q-signature={digest}", credentials.secret_id(), headers.keys().cloned().collect::<Vec<_>>().join(";"), query.keys().cloned().collect::<Vec<_>>().join(";")))
@@ -200,7 +200,7 @@ fn hmac(key: &[u8], value: &[u8]) -> Result<String, SdkError> {
     let mut mac = Hmac::<Sha1>::new_from_slice(key)
         .map_err(|_| SdkError::Signing("failed to initialize COS HMAC"))?;
     mac.update(value);
-    Ok(format!("{:x}", mac.finalize().into_bytes()))
+    Ok(hex(&mac.finalize().into_bytes()))
 }
 
 #[cfg(test)]
