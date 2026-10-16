@@ -1,0 +1,28 @@
+[package]
+name = "tencentcloud-sdk-cos"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+description = "Bounded asynchronous Tencent Cloud COS XML API client"
+
+[features]
+default = []
+transport-reqwest = ["tencentcloud-sdk-core/transport-reqwest"]
+
+[dependencies]
+tencentcloud-sdk-core = { path = "../core", version = "0.1.0", default-features = false, features = ["cos-signing"] }
+bytes.workspace = true
+http.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+quick-xml.workspace = true
+base64.workspace = true
+md-5.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "test-util", "net", "io-util"] }
+
+[lints]
+workspace = true

@@ -7,3 +7,6 @@ pub use tencentcloud_sdk_core::{
     Operation, RequestOptions, ResponseMetadata, SdkError, ServiceError,
 };
 pub use tencentcloud_sdk_core::{credentials, runtime, transport};
+
+#[cfg(feature = "cos")]
+pub use tencentcloud_sdk_cos as cos;

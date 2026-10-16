@@ -2,7 +2,7 @@
 
 按 Rust 惯用法设计的腾讯云 API 3.0 SDK：对外一个入口 crate，对内将共享内核与产品封装分离。Java SDK 只用于协议和模型参考，不移植其类层次或反射调用。
 
-当前实现的是 `tencentcloud-sdk-core`，尚无产品 crate；两个包均暂不发布。架构文档描述的产品 feature、分页、SSE 等能力不代表已经实现。
+当前包含共享内核 `tencentcloud-sdk-core` 与按需启用的 COS 产品 crate；各包均暂不发布。架构文档描述的其他产品、自动分页、SSE 等能力不代表已经实现。
 
 ## 已实现
 
@@ -11,6 +11,7 @@
 - 静态凭证与显式环境凭证加载；支持临时 Token、自定义异步凭证提供器。
 - 可选凭证文件、CVM 实例角色、STS AssumeRole、TKE/OIDC、显式默认凭证链，以及共享缓存和按需自动刷新。
 - TC3-HMAC-SHA256、POST JSON、固定操作描述和动态通用调用。
+- `cos` feature：独立 COS XML REST 客户端，支持常用对象/桶操作、分块上传和预签名 URL，见 [COS guide](crates/cos/README.md)。
 - 可替换 Transport；可选 reqwest/Rustls 连接池实现。
 - 按产品的 HTTPS 根端点覆盖、单次 Region/语言/Header/超时选项。
 - JSON 统一响应外层、强类型解析、保留官方错误码与 RequestId。
@@ -64,7 +65,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 - HTTP 非 200 也解析腾讯云 JSON 错误；缺失 Content-Type 时尝试 JSON，存在时必须为 application/json，可带 charset。
 - 服务错误 message 可能含业务信息，仅通过字段显式访问，不进入默认 Display/Debug；调用方显式访问错误来源时仍需注意其中的敏感信息。
 - 默认不读取凭证文件或探测元数据；文件和角色凭证必须显式启用并选择，SDK 不持久化密钥。
-- 业务 API 仍仅支持 POST JSON；角色元数据使用 GET。当前不支持旧版签名、二进制/multipart、SSE、自动分页、并发限额和容灾切换。
+- API 3.0 调用仍仅支持 POST JSON；COS 使用独立 XML REST/二进制协议与 HMAC-SHA1 签名。当前不支持通用旧版签名、HTTP multipart/form-data、SSE、自动分页、并发限额和容灾切换。
 
 ## 本地校验
 
@@ -78,7 +79,7 @@ cargo tree -e normal --no-default-features
 bash scripts/check-coverage.sh
 ```
 
-全 feature 生产代码行覆盖率要求 **≥90%**，当前实测 **92.25%**；口径、工具配置和报告命令见 [Test coverage](docs/coverage.md)。
+全 feature 生产代码行覆盖率要求 **≥90%**，当前实测 **94.25%**；口径、工具配置和报告命令见 [Test coverage](docs/coverage.md)。
 
 测试使用固定假凭证与 MockTransport；HTTP 适配器测试只访问 127.0.0.1 临时端口，不依赖真实腾讯云凭证。签名预期值通过独立 Python hashlib/hmac 实现核对。
 
