@@ -89,7 +89,7 @@ The minimum supported Rust version, **1.85.0**, has been verified on macOS ARM. 
 
 ## Releases
 
-Release Please creates or updates PRs for the shared workspace version and [changelog](CHANGELOG.md) on pushes to `main`. A separate publishing workflow tags the merged version PR commit as `vX.Y.Z`, creates a GitHub Release with that version's changelog notes, and publishes all five crates to crates.io in dependency order. The SDK is licensed under [Apache-2.0](LICENSE). See the [release guide](docs/releases.md) for credentials, safety checks, and recovery.
+Release Please creates or updates PRs for the shared workspace version and [changelog](CHANGELOG.md) on pushes to `main`. A separate publishing workflow tags the merged version PR commit as `vX.Y.Z`, creates a GitHub Release with that version's changelog notes, and publishes all five crates to crates.io in dependency order. The SDK is licensed under [Apache-2.0](LICENSE); third-party attribution is in [NOTICE](NOTICE). See the [release guide](docs/releases.md) for credentials, safety checks, and recovery.
 
 ## Design documents
 

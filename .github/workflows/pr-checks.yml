@@ -12,6 +12,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  release-validation:
+    name: Release metadata and NOTICE
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out the PR merge commit
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Test publication validation without credentials or network calls
+        run: python3 -B -m unittest discover -s scripts/tests -v
+
   tests-and-coverage:
     name: Tests and coverage (Rust 1.85)
     runs-on: ubuntu-latest

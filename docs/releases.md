@@ -32,7 +32,7 @@ The independent [Publish crates workflow](../.github/workflows/publish-crates.ym
 
 Configure a GitHub Actions repository secret named **`CARGO_REGISTRY_TOKEN`** before merging the first generated version PR. Store the credential directly in GitHub's Secrets UI, never in chat, source, or shell arguments. Its crates.io account must have a verified email, be allowed to create the five package names for their first publication, and own the crates or have the necessary team permissions for updates. Use the narrowest available publish scopes for these exact names. A name being unclaimed is not a reservation; authorization and name availability are enforced by crates.io at publication time. The workflow does not provision credentials, modify owners, or change repository settings.
 
-The prepare job has read-only repository/PR permissions. The publish job checks out the exact version PR commit, not the latest `main` code. It installs Rust 1.85.0, validates all five package versions, seven internal dependency requirements, lockfile, nonempty version changelog notes, registry restrictions, licenses and README attribution, then runs all-feature and no-default-feature tests and strict rustdoc. Registry credentials are present only in the final tag/Release/upload step. Missing registry credentials stop the workflow before creating a tag or GitHub Release.
+The prepare job has read-only repository/PR permissions. The publish job checks out the exact version PR commit, not the latest `main` code. It installs Rust 1.85.0, validates all five package versions, seven internal dependency requirements, lockfile, nonempty version changelog notes, registry restrictions, licenses and NOTICE attribution, then runs all-feature and no-default-feature tests and strict rustdoc. Registry credentials are present only in the final tag/Release/upload step. Missing registry credentials stop the workflow before creating a tag or GitHub Release.
 
 The final step creates a lightweight `vX.Y.Z` tag at that exact commit using the built-in `GITHUB_TOKEN`. An existing lightweight or annotated tag is accepted only if it resolves to the same commit; no tag is moved or replaced. Immediately after verifying the tag, the workflow creates a published GitHub Release named `vX.Y.Z`, using only that version's section from the checked-in `CHANGELOG.md` as its notes. SemVer prereleases are marked as prereleases; build metadata alone does not make a version a prerelease. An existing published Release for the verified tag is reused without changing its title, notes, or assets; a draft or conflicting prerelease status stops the workflow for inspection. The existing `contents: write` permission and built-in token suffice; no additional Action, PAT, or SDK dependency is needed.
 
@@ -44,13 +44,19 @@ The workflow then publishes these packages sequentially with `cargo publish --lo
 4. `tencentcloud-sdk-ssm`
 5. `tencentcloud-sdk`
 
-Each uploaded archive must contain matching source-commit metadata, LICENSE, and README with third-party attribution. The workflow verifies its SHA-256 against the crates.io sparse index and waits up to 30 index checks (10 seconds apart) before moving to a dependent package. The GitHub Release records the source tag, not the completion of crates.io uploads; inspect the workflow result to confirm publication of all five packages. The publishing workflow is serialized and is never cancelled by a newer version push.
+Each uploaded archive must contain matching source-commit metadata, LICENSE, README, and NOTICE. Every package's NOTICE must match the repository-root NOTICE and retain the upstream attribution; archive copies must match their source files byte-for-byte. README files may remain concise and link to NOTICE. The workflow verifies its SHA-256 against the crates.io sparse index and waits up to 30 index checks (10 seconds apart) before moving to a dependent package. The GitHub Release records the source tag, not the completion of crates.io uploads; inspect the workflow result to confirm publication of all five packages. The publishing workflow is serialized and is never cancelled by a newer version push.
 
 ### Recovery
 
 Git tags, GitHub Releases, and registry uploads are not atomic: a tag can remain if Release creation fails, and both the tag and Release can remain if a later upload fails. Do not delete/move that tag, recreate a published Release, or overwrite a registry version. Manually dispatch **Publish crates** on `main` before merging another version PR. It finds the latest version-manifest commit even if unrelated code has subsequently landed on `main`. The workflow first verifies the existing tag and reuses its published GitHub Release, or creates the missing Release from the same version's notes. Existing registry versions are packaged again with stable Cargo 1.85-compatible `cargo package --locked --package NAME` and skipped only when their checksums match the local archive exactly; a mismatch or yanked version fails closed. The package command deliberately omits `--registry`, which requires nightly in Cargo 1.85. Registry selection remains explicit for `cargo publish`, all manifests restrict publication to `crates-io`, and checksum lookups use the crates.io index. Crates.io versions cannot be overwritten. Cargo failures are not blindly retried; a maintainer initiates a new run after inspecting the cause.
 
 Manual dispatch always targets the latest manifest version, not an arbitrary old release. If a newer version PR is merged before a previous partial publication is recovered, recovering the older version requires a separately reviewed process. Do not mark such an incomplete release as successfully published.
+
+### 0.2.0 README attribution validation failure
+
+The 0.2.0 snapshot stopped during metadata validation because the root README had been simplified while the publishing script still required embedded attribution. Publication did not reach the tag/Release/upload step. Attribution now lives in a NOTICE file shipped by every package, with both metadata and archive validation enforcing its presence and contents.
+
+Merge this fix and then the next generated version PR to publish a corrected snapshot. Rerunning the original 0.2.0 job, or manually dispatching before a new version PR is merged, still selects the old version-PR commit and its old script. Do not change the workflow to publish arbitrary latest-main code under the old version.
 
 ### Initial 0.1.0 package-name collision
 
@@ -59,6 +65,14 @@ The source tag and GitHub Release `v0.1.0` exist, but that snapshot refers to th
 The replacement package is `tencentcloud-sdk-foundation`, with the matching Cargo-derived Rust library name `tencentcloud_sdk_foundation`. Core imports must use the new name; no old-name alias is retained. The other four package names are unchanged. After merging the name/packaging fix, merge the next generated version PR to publish a new validated snapshot. Do not rerun the original failed job expecting it to use new scripts or names: publication intentionally checks out the exact version-PR commit, so `v0.1.0` remains the old snapshot. Package-name availability is checked before implementation but is not a reservation; crates.io enforces availability and ownership at upload time. Ensure `CARGO_REGISTRY_TOKEN` permits creating/publishing `tencentcloud-sdk-foundation`; a token restricted to the old core name is insufficient.
 
 ## Local automation checks
+
+Run the publication metadata and archive regressions with Python 3.11 or newer:
+
+```bash
+python3 -B -m unittest discover -s scripts/tests -v
+```
+
+The tests validate current package metadata with simulated Git state and build synthetic archives under ignored `target/`. They reject missing, excluded, incomplete or inconsistent NOTICE files and missing/modified archive files, while accepting concise README files. They do not create tags, Releases or uploads, invoke Cargo, or contact a release service. The same tests run in the PR workflow before release.
 
 The optional local checker validates the configuration against the upstream schema, checks workflow safety, and exercises the real Rust strategy without a GitHub client or any network calls. It simulates the initial release, pre-1.0 patch/feature/breaking releases, stable feature/breaking releases, and a CI-only change. It verifies all five package versions, seven internal dependency requirements, lockfile updates, changelog entries, and the absence of generated releases/tags. Additional lifecycle checks cover merging a version PR without a tag, ignoring older commits in the next changelog, removing the merged PR's pending label, a no-change rerun, and failing closed when the version boundary is unavailable.
 
@@ -75,7 +89,7 @@ Run `actionlint .github/workflows/release-please.yml .github/workflows/publish-c
 ## Boundaries
 
 - Release Please creates or updates version/changelog PRs only. It never creates tags or GitHub Releases, merges its own PRs, or runs `cargo publish`. The independent publishing workflow owns tag creation, GitHub Releases, and crates.io uploads.
-- All five crates are explicitly restricted to the `crates-io` registry and inherit Apache-2.0 and the repository URL. Each package includes its license and readme; third-party attribution is retained in the readme rather than a separate notices file.
+- All five crates are explicitly restricted to the `crates-io` registry and inherit Apache-2.0 and the repository URL. Each package includes LICENSE, README.md and NOTICE; third-party attribution is retained in NOTICE rather than embedded in README.
 - Release Please checks out only the automation scripts and requires no Rust toolchain. The publishing job installs Rust for package validation and upload; neither workflow needs Tencent Cloud credentials or calls Tencent Cloud APIs.
 - Concurrent runs are serialized per ref and are not cancelled halfway through release operations.
 
