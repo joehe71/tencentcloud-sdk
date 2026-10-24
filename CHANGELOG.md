@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/joehe71/tencentcloud-sdk/compare/v0.1.1...v0.2.0) (2026-10-24)
+
+
+### Features
+
+* expose shared instance-role credentials for SSM and COS ([#20](https://github.com/joehe71/tencentcloud-sdk/issues/20)) ([8e72813](https://github.com/joehe71/tencentcloud-sdk/commit/8e728130b5ea3a32315691ff4af583d883fe8d94))
+
 ## [0.1.1](https://github.com/joehe71/tencentcloud-sdk/compare/v0.1.0...v0.1.1) (2026-10-16)
 
 
