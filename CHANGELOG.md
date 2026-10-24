@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/joehe71/tencentcloud-sdk/compare/v0.2.0...v0.2.1) (2026-10-24)
+
+
+### Bug Fixes
+
+* package attribution in NOTICE files ([#22](https://github.com/joehe71/tencentcloud-sdk/issues/22)) ([f29c42f](https://github.com/joehe71/tencentcloud-sdk/commit/f29c42f131176e20c846ff35d310b1b4047651de))
+
 ## [0.2.0](https://github.com/joehe71/tencentcloud-sdk/compare/v0.1.1...v0.2.0) (2026-10-24)
 
 
