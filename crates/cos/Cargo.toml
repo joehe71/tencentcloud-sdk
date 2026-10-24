@@ -7,7 +7,7 @@ publish = ["crates-io"]
 license.workspace = true
 repository.workspace = true
 readme = "README.md"
-include = ["src/**", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE"]
+include = ["src/**", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE", "NOTICE"]
 description = "Bounded asynchronous Tencent Cloud COS XML API client"
 
 [features]

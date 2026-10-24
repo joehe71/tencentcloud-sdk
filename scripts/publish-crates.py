@@ -110,7 +110,7 @@ def validate_attribution(content, name):
     for marker in ("https://github.com/TencentCloud/tencentcloud-sdk-java", "3.2.40",
                    "Copyright (c) 2017-2025 Tencent. All Rights Reserved.",
                    "Apache-2.0", "Annotated protocol field names/types and operation identifiers were transformed"):
-        require(marker in content, f"Missing third-party attribution in README: {name}")
+        require(marker in content, f"Missing third-party attribution in NOTICE: {name}")
 
 
 def release_notes(version):
@@ -133,6 +133,8 @@ def validate(version, sha):
     require(set(workspace["members"]) == {path for _, path in PACKAGES if path != "."}, "Unexpected workspace members")
     require(workspace["package"]["license"] == "Apache-2.0", "Unexpected SDK license")
     require(workspace["package"]["repository"] == "https://github.com/joehe71/tencentcloud-sdk", "Unexpected package repository")
+    require((ROOT / "NOTICE").is_file(), "Missing repository NOTICE")
+    root_notice = (ROOT / "NOTICE").read_bytes()
     dependency_count = 0
     names = {name for name, _ in PACKAGES}
     for name, path in PACKAGES:
@@ -144,10 +146,13 @@ def validate(version, sha):
         for field in ("license", "repository"):
             require(package.get(field) == {"workspace": True}, f"Expected shared {field}: {name}")
         require((directory / "LICENSE").read_bytes() == (ROOT / "LICENSE").read_bytes(), f"Missing or inconsistent LICENSE: {name}")
-        for file in ("LICENSE", "README.md"):
+        for file in ("LICENSE", "README.md", "NOTICE"):
             require(file in package.get("include", []), f"Package excludes {file}: {name}")
         require(package.get("readme") == "README.md", f"Unexpected readme: {name}")
-        validate_attribution((directory / "README.md").read_text(), name)
+        notice = directory / "NOTICE"
+        require(notice.is_file(), f"Missing NOTICE: {name}")
+        validate_attribution(notice.read_text(encoding="utf-8"), name)
+        require(notice.read_bytes() == root_notice, f"Inconsistent NOTICE: {name}")
         for section in ("dependencies", "dev-dependencies", "build-dependencies"):
             for dependency, spec in cargo.get(section, {}).items():
                 if dependency in names:
@@ -223,8 +228,10 @@ def archive_checksum(name, version, sha):
         require(info is not None, "Archive has no source commit metadata")
         require(json.load(info)["git"]["sha1"] == sha, "Archive source commit mismatch")
         directory = ROOT / dict(PACKAGES)[name]
-        for file in ("LICENSE", "README.md"):
-            included = package.extractfile(f"{name}-{version}/{file}")
+        for file in ("LICENSE", "README.md", "NOTICE"):
+            member = f"{name}-{version}/{file}"
+            require(member in package.getnames(), f"Archive has missing or inconsistent {file}")
+            included = package.extractfile(member)
             require(included is not None and included.read() == (directory / file).read_bytes(), f"Archive has missing or inconsistent {file}")
     return hashlib.sha256(archive.read_bytes()).hexdigest()
 
