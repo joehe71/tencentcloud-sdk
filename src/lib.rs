@@ -16,3 +16,7 @@ pub use tencentcloud_sdk_ses as ses;
 
 #[cfg(feature = "ssm")]
 pub use tencentcloud_sdk_ssm as ssm;
+
+#[cfg(all(test, feature = "credentials-roles", feature = "cos", feature = "ssm"))]
+#[path = "tests/instance_role.rs"]
+mod instance_role_tests;

@@ -21,10 +21,13 @@ mod roles;
 pub use chain::DefaultCredentialsProvider;
 #[cfg(feature = "credentials-roles")]
 pub use role_http::RoleProviderOptions;
+/// The original CVM-specific name for [`InstanceRoleCredentialsProvider`].
+#[cfg(feature = "credentials-roles")]
+pub use roles::InstanceRoleCredentialsProvider as CvmRoleCredentialsProvider;
 #[cfg(feature = "credentials-roles")]
 pub use roles::{
-    AssumeRoleConfig, AssumeRoleCredentialsProvider, CvmRoleCredentialsProvider, OidcRoleConfig,
-    OidcRoleCredentialsProvider, WebIdentityToken,
+    AssumeRoleConfig, AssumeRoleCredentialsProvider, InstanceRoleCredentialsProvider,
+    OidcRoleConfig, OidcRoleCredentialsProvider, WebIdentityToken,
 };
 
 /// An immutable credentials snapshot with redacted default formatting.

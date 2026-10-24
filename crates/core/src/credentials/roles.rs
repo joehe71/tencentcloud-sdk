@@ -235,10 +235,14 @@ struct OidcRequest<'a> {
     duration_seconds: u64,
 }
 
-/// Cached CVM instance-role credentials, fetched from the metadata server, not STS.
+/// Cached instance-role credentials fetched from Tencent Cloud metadata, not STS.
+///
+/// Select this provider explicitly for CVM or container instances exposing the same
+/// CAM metadata protocol. It never reads environment keys, profiles, or OIDC tokens,
+/// and never falls back to another identity when metadata acquisition fails.
 #[derive(Clone)]
-pub struct CvmRoleCredentialsProvider(Arc<RefreshingProvider>);
-impl CvmRoleCredentialsProvider {
+pub struct InstanceRoleCredentialsProvider(Arc<RefreshingProvider>);
+impl InstanceRoleCredentialsProvider {
     /// Uses the specified metadata role name, or discovers it when None.
     ///
     /// # Errors
@@ -249,21 +253,21 @@ impl CvmRoleCredentialsProvider {
         }
         let http = CredentialHttp::new(options.clone())?;
         Ok(Self(Arc::new(RefreshingProvider::new(
-            CvmSource { role_name, http },
+            InstanceRoleSource { role_name, http },
             options,
         ))))
     }
 }
-impl ProvideCredentials for CvmRoleCredentialsProvider {
+impl ProvideCredentials for InstanceRoleCredentialsProvider {
     fn provide_credentials(&self) -> BoxFuture<'_, Result<Arc<Credentials>, SdkError>> {
         self.0.provide()
     }
 }
-struct CvmSource {
+struct InstanceRoleSource {
     role_name: Option<String>,
     http: CredentialHttp,
 }
-impl LoadCredentials for CvmSource {
+impl LoadCredentials for InstanceRoleSource {
     fn load(&self) -> BoxFuture<'_, Result<ExpiringCredentials, SdkError>> {
         Box::pin(async { self.http.metadata(self.role_name.as_deref()).await })
     }
@@ -352,6 +356,6 @@ macro_rules! redacted_debug {
 }
 redacted_debug!(
     OidcRoleCredentialsProvider,
-    CvmRoleCredentialsProvider,
+    InstanceRoleCredentialsProvider,
     AssumeRoleCredentialsProvider
 );

@@ -20,7 +20,7 @@ fn build_client(transport: Arc<dyn Transport>) -> Result<Client, Error> {
 }
 ```
 
-Construction performs no credential lookup or network I/O. Reuse `RoleProviderOptions` and the same transport to supply a refreshing CVM, `AssumeRole` or TKE OIDC provider; COS and STS use the same core credentials type. No permanent AK/SK is required when Pod identity is configured.
+Construction performs no credential lookup or network I/O. Reuse `RoleProviderOptions` and the same transport to supply a refreshing `InstanceRoleCredentialsProvider`, `AssumeRole` or TKE OIDC provider; COS and STS use the same core credentials type. No permanent AK/SK is required when role identity is configured. Clone one instance-role provider into both COS and the SSM core client to share credential refresh; do not replace it with a one-time static snapshot. See the [instance-role guide](../../docs/credentials.md#instance-roles-and-eksci-integration) for EKSCI metadata compatibility requirements and a shared-client example.
 
 With the facade:
 

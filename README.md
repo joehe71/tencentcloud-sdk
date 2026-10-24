@@ -9,7 +9,7 @@ The workspace includes the `tencentcloud-sdk-foundation` package (Rust library n
 - Rust 2024 workspace; the facade re-exports core and has no default features.
 - Shared asynchronous Client with immutable configuration; requires a Tokio runtime with time enabled. The SDK does not create a runtime.
 - Static credentials, explicit environment credential loading, temporary tokens, and custom asynchronous credential providers.
-- Optional credential files, CVM instance roles, STS AssumeRole, TKE/OIDC, an explicitly selected default credential chain, shared caching, and on-demand refresh.
+- Optional credential files, explicit instance roles through `InstanceRoleCredentialsProvider` (with the existing CVM name retained), STS AssumeRole, TKE/OIDC, an explicitly selected default credential chain, shared caching, and on-demand refresh.
 - TC3-HMAC-SHA256, POST JSON, fixed operation descriptors, and dynamic generic calls.
 - `cos`: a separate COS XML REST client with common object/bucket operations, multipart uploads, and presigned URLs. See the [COS guide](crates/cos/README.md).
 - `ses`: 36 typed SES 2020-10-02 APIs using core. See the [SES guide](crates/ses/README.md).
