@@ -1,6 +1,6 @@
 [package]
 name = "tencentcloud-sdk-cos"
-version = "0.2.0"
+version = "0.2.1"
 edition.workspace = true
 rust-version.workspace = true
 publish = ["crates-io"]
@@ -15,7 +15,7 @@ default = []
 transport-reqwest = ["tencentcloud-sdk-foundation/transport-reqwest"]
 
 [dependencies]
-tencentcloud-sdk-foundation = { path = "../core", version = "0.2.0", default-features = false, features = ["cos-signing"] }
+tencentcloud-sdk-foundation = { path = "../core", version = "0.2.1", default-features = false, features = ["cos-signing"] }
 bytes.workspace = true
 http.workspace = true
 futures-util.workspace = true
