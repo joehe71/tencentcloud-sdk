@@ -48,6 +48,53 @@ The TKE cluster must enable OIDC resource access, the Pod must use the intended 
 
 For non-TKE OIDC integrations, construct `OidcRoleConfig::new(region, provider_id, role_arn, token)` and pass it to `OidcRoleCredentialsProvider::new`. `WebIdentityToken::File` supports projected-file rotation; `Inline` is caller-managed and cannot rotate itself. Session names and requested durations can be overridden through configuration. The default requested duration is 7,200 seconds; server-side role limits remain authoritative.
 
+## Instance roles and EKSCI integration
+
+`InstanceRoleCredentialsProvider::new(role_name, options)` explicitly selects the instance's CAM metadata identity. This is different from TKE Pod OIDC: it does not read a projected ServiceAccount token, call STS, or inspect environment/profile credentials. The original `CvmRoleCredentialsProvider` name remains an export of the same type; its constructor, cache sharing and behavior are unchanged.
+
+The implemented metadata contract is:
+
+1. `GET http://metadata.tencentyun.com/latest/meta-data/cam/security-credentials/` returns one role name as plain UTF-8 text. Passing `Some(role_name)` skips this discovery request.
+2. `GET http://metadata.tencentyun.com/latest/meta-data/cam/security-credentials/{role_name}` returns `Code: "Success"`, `TmpSecretId`, `TmpSecretKey`, `Token` and Unix-second `ExpiredTime`.
+3. The provider validates and caches the entire credential triple, refreshing on demand before expiration. Clones share one cache and refresh gate.
+
+For an independent EKSCI instance with a bound CAM role, this provider is the SDK integration entry point **when its container-visible metadata service exposes this contract**. EKSCI metadata compatibility and reachability have not been verified on a live instance. Do not interpret the platform-neutral entry point or offline fixtures as an EKSCI deployment certification. Check the instance's official metadata documentation and network access before deployment; this provider does not implement an alternative EKSCI-specific metadata protocol.
+
+Enable `credentials-roles`, `transport-reqwest`, `ssm` and `cos` on the facade to share one identity between both services:
+
+```rust,no_run
+use std::{sync::Arc, time::Duration};
+use tencentcloud_sdk::{
+    Client,
+    cos,
+    credentials::{InstanceRoleCredentialsProvider, RoleProviderOptions},
+    ssm::v20190923,
+    transport::ReqwestTransport,
+};
+
+fn build_clients() -> Result<(v20190923::Client, cos::Client), Box<dyn std::error::Error>> {
+    let transport = Arc::new(ReqwestTransport::new(Duration::from_secs(10))?);
+    let identity = InstanceRoleCredentialsProvider::new(
+        None,
+        RoleProviderOptions::new(transport.clone()),
+    )?;
+    let core = Client::builder()
+        .credentials_provider(identity.clone())
+        .shared_transport(transport.clone())
+        .region("ap-shanghai")
+        .build()?;
+    let objects = cos::Client::builder("examplebucket-1250000000", "ap-shanghai")
+        .credentials_provider(identity)
+        .shared_transport(transport)
+        .build()?;
+    Ok((v20190923::Client::new(core), objects))
+}
+```
+
+Construction performs no I/O. Each SSM call obtains the current snapshot and sends `X-TC-Token`; each COS call obtains it and sends `x-cos-security-token`. Do not fetch a temporary triple once and convert it to static credentials, and do not store a separate permanent COS SecretId/SecretKey in SSM for this role-based path. Credential refresh is independent of any application-secret caching.
+
+Applications should explicitly select OIDC for TKE Pods and instance metadata for authorized instance-role deployments. Do not use the default chain for identity isolation: environment/profile credentials take precedence there. A metadata error must not switch to local mode, static keys or another identity, and an OIDC error must not switch to instance metadata. Attach a least-privilege CAM policy permitting the required SSM secrets and COS buckets/object prefixes. Role binding and metadata access do not themselves grant business API permissions.
+
 ## Other providers
 
 - `StaticCredentialsProvider`: a caller-supplied immutable triple; no expiration tracking.
